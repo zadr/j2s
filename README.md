@@ -8,6 +8,9 @@ No, yeah, that's it. You give j2s json and it gives you Swift structs. You can p
 
 If you want to make it do anything else, you'll have to write some more code. I'll probably accept pull requests, but, you should probably look into other tools like [Sourcery](https://github.com/krzysztofzablocki/Sourcery) instead.
 
+## Okay
+Oh. j2s will convert snake_case_key_names into camelCasePropertyNames, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/j2s.swift#L209) (exact line of code may change, but look around there for the algorithm).
+
 ## What version of Swift does this target?
 j2s.xcodeproj requires Swift 3 (Xcode 8 or greater) to build. The code it outputs also requires Swift 3, but only because generated `Equatable` implementations are in an `extension`.
 
@@ -148,6 +151,9 @@ There are other awesome codegen tools out there, but, couldn't find anything tha
 2. …Output Swift `struct`s…
 3. …Along with implementations of `Equatable` and `Hashable`…
 4. …Without having to go through an intermediary codegen format.
+
+## Still hung up on depluralization? (Singularity?)
+A json dictionary with a key named `potatoes`, where the value is a list of dictionaries will be given the Swift type `[Potato]`. Similarly, `soliloquies` becomes `[Soliloquy]`, `dwarves` and `[Dwarf]`, and so on. Depluralization is a giant `if` statement though, so while `indices` becomes `[Index]`, `matrices` incorrectly becomes `matrex`.
 
 ## Okay then
 Before you go, remember that j2s code is released under a [2-Clause BSD License](LICENSE.md) and all contributions and project activity should be in line with our [Code of Conduct](CODE_OF_CONDUCT.md).
