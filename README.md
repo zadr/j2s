@@ -1,6 +1,8 @@
 ## What's this?
 j2s is a macOS app that converts [JSON](https://en.wikipedia.org/wiki/JSON) dictionaries into [Swift](https://swift.org) `struct`s. It also outputs implementations of [Equatable](https://developer.apple.com/reference/swift/equatable) and [Hashable](https://developer.apple.com/reference/swift/hashable) for every `struct` it generates.
 
+![Screenshot](Screenshot.png?raw=true)
+
 ## That's it? Can I make it do anything else?
 No, yeah, that's it. You give j2s json and it gives you Swift structs. You can pick if it outputs to one file or a _n_ files for _n_ structs.
 
