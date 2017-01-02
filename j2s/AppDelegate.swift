@@ -56,7 +56,7 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
                 structs = structify(name: rootElementName(), json: dictionary)
                 output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             } else if let array = parsed as? [[String: Any]] {
-                structs = array.map({ return structify(name: rootElementName(), json: $0) }).reduce([], +).merge()
+                structs = array.map({ return structify(name: rootElementName(), json: $0) }).joined().merge()
                 output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             }
         } catch let exception {
