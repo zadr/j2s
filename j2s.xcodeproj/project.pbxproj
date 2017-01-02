@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B61168111E19DA7C0066EEFE /* StringTransformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61168101E19DA7C0066EEFE /* StringTransformations.swift */; };
-		B61168151E19DB7A0066EEFE /* CODE_OF_CONDUCT.md in Sources */ = {isa = PBXBuildFile; fileRef = B61168121E19DB7A0066EEFE /* CODE_OF_CONDUCT.md */; };
-		B61168161E19DB7A0066EEFE /* LICENSE.md in Sources */ = {isa = PBXBuildFile; fileRef = B61168131E19DB7A0066EEFE /* LICENSE.md */; };
-		B61168171E19DB7A0066EEFE /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = B61168141E19DB7A0066EEFE /* README.md */; };
 		B6D3E02D1E17709F00841A0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3E02C1E17709F00841A0D /* AppDelegate.swift */; };
 		B6D3E02F1E17709F00841A0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6D3E02E1E17709F00841A0D /* Assets.xcassets */; };
 		B6D3E0321E17709F00841A0D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B6D3E0301E17709F00841A0D /* MainMenu.xib */; };
@@ -159,9 +156,6 @@
 				B6FA39A71E183D8200924992 /* structify.swift in Sources */,
 				B61168111E19DA7C0066EEFE /* StringTransformations.swift in Sources */,
 				B6D3E02D1E17709F00841A0D /* AppDelegate.swift in Sources */,
-				B61168171E19DB7A0066EEFE /* README.md in Sources */,
-				B61168151E19DB7A0066EEFE /* CODE_OF_CONDUCT.md in Sources */,
-				B61168161E19DB7A0066EEFE /* LICENSE.md in Sources */,
 				B6FA39A51E183D2E00924992 /* codegen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
