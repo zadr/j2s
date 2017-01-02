@@ -379,24 +379,24 @@
         <window title="j2s" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" tabbingMode="disallowed" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
-            <rect key="contentRect" x="335" y="390" width="640" height="480"/>
+            <rect key="contentRect" x="335" y="390" width="672" height="504"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="640" height="480"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="640" height="480"/>
+                <rect key="frame" x="0.0" y="0.0" width="672" height="504"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uE5-tO-YPB">
-                        <rect key="frame" x="0.0" y="44" width="320" height="436"/>
+                        <rect key="frame" x="0.0" y="44" width="336" height="460"/>
                         <clipView key="contentView" id="xFa-su-JIT">
-                            <rect key="frame" x="1" y="1" width="318" height="434"/>
+                            <rect key="frame" x="1" y="1" width="334" height="458"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" findStyle="panel" allowsUndo="YES" allowsNonContiguousLayout="YES" id="W9w-ic-cg0">
-                                    <rect key="frame" x="0.0" y="0.0" width="318" height="434"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="334" height="458"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="318" height="434"/>
+                                    <size key="minSize" width="334" height="458"/>
                                     <size key="maxSize" width="510" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment>
@@ -420,21 +420,21 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="ge1-uE-CSL">
-                            <rect key="frame" x="303" y="1" width="16" height="434"/>
+                            <rect key="frame" x="319" y="1" width="16" height="458"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <scrollView wantsLayer="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qAi-kZ-bSd">
-                        <rect key="frame" x="320" y="44" width="320" height="436"/>
+                        <rect key="frame" x="336" y="44" width="336" height="460"/>
                         <clipView key="contentView" id="cTi-fw-Og9">
-                            <rect key="frame" x="1" y="1" width="318" height="434"/>
+                            <rect key="frame" x="1" y="1" width="334" height="458"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" usesRuler="YES" allowsNonContiguousLayout="YES" linkDetection="YES" textCompletion="NO" id="zcY-gy-e67">
-                                    <rect key="frame" x="0.0" y="0.0" width="318" height="434"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="334" height="458"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="318" height="434"/>
+                                    <size key="minSize" width="334" height="458"/>
                                     <size key="maxSize" width="522" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="text">
@@ -454,7 +454,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="8gx-T9-3Bd">
-                            <rect key="frame" x="303" y="1" width="16" height="434"/>
+                            <rect key="frame" x="319" y="1" width="16" height="458"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -466,21 +466,21 @@
                         </buttonCell>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gvO-nF-DM2">
-                        <rect key="frame" x="556" y="5" width="70" height="32"/>
+                        <rect key="frame" x="588" y="5" width="70" height="32"/>
                         <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="SmR-Bw-q0q">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="TDJ-uA-XW1">
-                        <rect key="frame" x="419" y="14" width="137" height="18"/>
+                        <rect key="frame" x="451" y="14" width="137" height="18"/>
                         <buttonCell key="cell" type="check" title="One Struct Per File" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vwT-tU-Fi9">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                     </button>
                     <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MnB-QM-A8V">
-                        <rect key="frame" x="240" y="12" width="160" height="23"/>
+                        <rect key="frame" x="256" y="12" width="160" height="23"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="160" id="nqa-vc-g0t"/>
                         </constraints>

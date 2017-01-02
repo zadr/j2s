@@ -22,13 +22,12 @@ j2s can take in the following JSON:
 
 ```json
 {
-  "what" : "paste json here",
-  "why" : "to see swift structs over there -->",
   "what_if_i_want_to" : [
-    "type? go for it, but uncheck the \"Pretty-Print JSON\" box down there first --v",
+    "type? sure, but uncheck the \"Pretty-Print JSON\" box down there --v",
     "boogie? wouldn't dream of stopping you"
   ],
-  "cool" : true
+  "why" : "to see swift structs over there -->",
+  "what" : "paste json here"
 }
 ```
 
@@ -36,33 +35,43 @@ and turn it into Swift code that looks like this:
 
 ```swift
 public struct Demo {
-	let cool: Bool
 	let what: String
 	let whatIfIWantTo: [String]
 	let why: String
 
-	init(_ dictionary: [String: Any]) {
-		self.cool = dictionary["cool"] as! Bool
-		self.what = dictionary["what"] as! String
-		self.whatIfIWantTo = dictionary["what_if_i_want_to"] as! [String]
-		self.why = dictionary["why"] as! String
+	init?(_ dictionary: [String: Any]) {
+		if let what = dictionary["what"] as? String {
+			self.what = what
+		} else {
+			return nil
+		}
+		
+		if let whatIfIWantTo = dictionary["what_if_i_want_to"] as? [[String]] {
+			self.whatIfIWantTo = whatIfIWantTo
+		} else {
+			return nil
+		}
+		
+		if let why = dictionary["why"] as? String {
+			self.why = why
+		} else {
+			return nil
+		}
 	}
 }
 
 extension Demo: Equatable {
- 	static func ==(x: Demo, y: Demo) -> Bool {
-		return x.cool == y.cool && 
-			x.what == y.what && 
+ 	public static func ==(x: Demo, y: Demo) -> Bool {
+		return x.what == y.what && 
 			x.whatIfIWantTo.count == y.whatIfIWantTo.count && 
-				(0 ..< whatIfIWantTo.count).reduce(false, { $0 || x.whatIfIWantTo[$1] == y.whatIfIWantTo[$1] }) && 
+				(0 ..< x.whatIfIWantTo.count).reduce(false, { $0 || x.whatIfIWantTo[$1] == y.whatIfIWantTo[$1] }) && 
 			x.why == y.why
 	} 
 }
 
 extension Demo: Hashable {
- 	var hashValue: Int {
-		return cool.hashValue ^ 
-			what.hashValue ^ 
+ 	public var hashValue: Int {
+		return what.hashValue ^ 
 			whatIfIWantTo.reduce(0, { return 33 &* $0 ^ $1.hashValue }) ^ 
 			why.hashValue
 	} 
@@ -104,9 +113,12 @@ will generate this Swift code:
 public struct Demo {
 	let foo: [Foo]
 
-	init(_ dictionary: [String: Any]) {
-		let foo = dictionary["foo"] as! [[String: Any]]
-		self.foo = foo.flatMap { return Foo($0) }
+	init?(_ dictionary: [String: Any]) {
+		if let foo = dictionary["foo"] as? [String: Any] {
+			self.foo = Foo(foo)
+		} else {
+			return nil
+		}
 	}
 }
 
@@ -131,11 +143,30 @@ public struct Foo {
 	let color: String?
 	let gizmo: String?
 
-	init(_ dictionary: [String: Any]) {
-		self.bar = dictionary["bar"] as! Int
-		self.baz = dictionary["baz"] as? Bool
-		self.color = dictionary["color"] as? String
-		self.gizmo = dictionary["gizmo"] as? String
+	init?(_ dictionary: [String: Any]) {
+		if let bar = dictionary["bar"] as? Int {
+			self.bar = bar
+		} else {
+			return nil
+		}
+		
+		if let baz = dictionary["baz"] as? Bool {
+			self.baz = baz
+		} else {
+			self.baz = nil
+		}
+		
+		if let color = dictionary["color"] as? String {
+			self.color = color
+		} else {
+			self.color = nil
+		}
+		
+		if let gizmo = dictionary["gizmo"] as? String {
+			self.gizmo = gizmo
+		} else {
+			self.gizmo = nil
+		}
 	}
 }
 

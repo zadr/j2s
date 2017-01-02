@@ -7,14 +7,14 @@ public struct Struct: CustomStringConvertible {
     public var description: String {
         let typeName = name.generatedClassName()
         var d = ""
-        properties.forEach {
-            if !$0.dateFormat.isEmpty {
-                d += "\nprivate let \(typeName)DateFormatter\(abs($0.dateFormat.hashValue)): DateFormatter = {"
-                d += "\n\tvar dateFormatter = DateFormatter()"
-                d += "\n\tdateFormatter.dateFormat = \"\($0.dateFormat)\""
-                d += "\n\treturn dateFormatter"
-                d += "\n}()\n\n"
-            }
+        properties.filter {
+            return !$0.dateFormat.isEmpty
+        } .forEach {
+            d += "\nprivate let \(typeName)DateFormatter\(abs($0.dateFormat.hashValue)): DateFormatter = {"
+            d += "\n\tvar dateFormatter = DateFormatter()"
+            d += "\n\tdateFormatter.dateFormat = \"\($0.dateFormat)\""
+            d += "\n\treturn dateFormatter"
+            d += "\n}()\n\n"
         }
 
         d += "public struct \(typeName) {"
@@ -39,7 +39,7 @@ public struct Struct: CustomStringConvertible {
     }
 
     private var initCode: String {
-        var i = "\tinit(_ dictionary: [String: Any]) {"
+        var i = "\tinit?(_ dictionary: [String: Any]) {"
         i += initInitializationCode
         i += "\n\t}"
         return i
@@ -48,48 +48,80 @@ public struct Struct: CustomStringConvertible {
     private var initInitializationCode: String {
         let sorted = properties.sorted(by: { x, y in return x.name < y.name })
         let lets: [String] = sorted.map {
-            if $0.isArray {
-                if $0.internetPrimitive {
-                    let a = $0.isOptional ? "as?" : "as!"
-                    return "self.\($0.name.camelCased()) = dictionary[\"\($0.name)\"] \(a) \($0.type)"
-                }
-
-                if $0.isOptional {
-                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.name.generatedClassName())($0) }"
+            if !$0.dateFormat.isEmpty {
+                if $0.isArray && $0.isOptional {
+                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String] {"
+                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap {"
+                    letString += "\n\t\t\t\treturn \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: $0)"
+                    letString += "\n\t\t\t}"
+                    letString += "\n\t\t} else {"
+                    letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                    letString += "\n\t\t\t}"
+                    return letString
+                } else if $0.isOptional {
+                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: \($0.name.camelCased()))"
                     letString += "\n\t\t} else {"
                     letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
                     letString += "\n\t\t}"
                     return letString
+                } else {
+                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: \($0.name.camelCased()))"
+                    letString += "\n\t\t} else {"
+                    letString += "\n\t\t\treturn nil"
+                    letString += "\n\t\t}"
+                    return letString
                 }
-
-                var letString = "\n\t\tlet \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as! [[String: Any]]"
-                letString += "\n\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.name.generatedClassName())($0) }"
+            } else if $0.isArray && $0.isOptional && $0.internetPrimitive {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [\($0.type)] {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t}"
                 return letString
-            } else if !$0.internetPrimitive {
-                if $0.isOptional {
-                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type)(\($0.name.camelCased()))"
-                    letString += "\n\t\t} else {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
-                    letString += "\n\t\t}"
-                    return letString
-                }
-
-                return "self.\($0.name.camelCased()) = \($0.type)(dictionary[\"\($0.name)\"] as! [String: Any])"
-            } else if $0.isURL {
-                if $0.isOptional {
-                    return "self.\($0.name.camelCased()) = URL(string: (dictionary[\"\($0.name)\"] as? String))"
-                }
-                return "self.\($0.name.camelCased()) = URL(string: (dictionary[\"\($0.name)\"] as! String))!"
-            } else if !$0.dateFormat.isEmpty {
-                if $0.isOptional {
-                    return "self.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: (dictionary[\"\($0.name)\"] as? String))"
-                }
-                return "self.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: (dictionary[\"\($0.name)\"] as! String))!"
-            } else {
-                let a = $0.isOptional ? "as?" : "as!"
-                return "self.\($0.name.camelCased()) = dictionary[\"\($0.name)\"] \(a) \($0.type)"
+            } else if $0.isArray && $0.isOptional {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.name.generatedClassName())($0) }"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t}"
+                return letString
+            } else if $0.isArray && $0.internetPrimitive {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [\($0.type)] {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\treturn nil"
+                letString += "\n\t\t}"
+                return letString
+            } else if $0.isOptional && $0.internetPrimitive {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t}"
+                return letString
+            } else if $0.internetPrimitive {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\treturn nil"
+                letString += "\n\t\t}"
+                return letString
+            } else if $0.isOptional {
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.generatedClassName())(\($0.name.camelCased()))"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t}"
+                return letString
+            } else { // single non-optional object
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.generatedClassName())(\($0.name.camelCased()))"
+                letString += "\n\t\t} else {"
+                letString += "\n\t\t\treturn nil"
+                letString += "\n\t\t}"
+                return letString
             }
         }
 
@@ -151,19 +183,19 @@ public struct Struct: CustomStringConvertible {
 public struct Property: Equatable, Hashable {
     let name: String
     let type: String
+
     let internetPrimitive: Bool
-    let dateFormat: String
     let isArray: Bool
-    let isURL: Bool
     let isOptional: Bool
 
-    init(name: String, type: String, dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isURL: Bool = false, isOptional: Bool = false) {
+    let dateFormat: String
+
+    init(name: String, type: String, dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false) {
         self.name = name
         self.type = type
         self.dateFormat = dateFormat
         self.internetPrimitive = internetPrimitive
         self.isArray = isArray
-        self.isURL = isURL
         self.isOptional = isOptional
     }
 
@@ -173,7 +205,6 @@ public struct Property: Equatable, Hashable {
             x.dateFormat == y.dateFormat &&
             x.internetPrimitive == y.internetPrimitive &&
             x.isArray == y.isArray &&
-            x.isURL == y.isURL &&
             x.isOptional == y.isOptional
     }
 
@@ -183,7 +214,6 @@ public struct Property: Equatable, Hashable {
             dateFormat.hashValue ^
             internetPrimitive.hashValue ^
             isArray.hashValue ^
-            isURL.hashValue ^
             isOptional.hashValue
     }
 }
