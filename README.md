@@ -70,22 +70,30 @@ extension Demo: Hashable {
 ```
 
 ## What about Optionals? I don't see any Optionals.
-Optionals are sort of handled by j2s. JSON doesn't have Optionals, so it's hard to map them over automatically. While parsing, if j2s is told to create the same `struct` multiple times, it considers any properties that don't exist in both models to be [Optional](http://swiftdoc.org/v3.0/type/Optional/).
+Optionals are sort of handled by j2s. JSON doesn't have Optionals, so it's hard to map them over automatically.
+
+While parsing, if j2s is told to create the same `struct` multiple times, it considers any properties that don't exist in both models to be [Optional](http://swiftdoc.org/v3.0/type/Optional/). 
+
+The same is also true for properties that show up as `null` and as a `Type`.
 
 `null`s are turned into `NSNull`.
 
 ## Oh.
 Yeah. Usually happens in the case of an array of dictionaries. This json:
+
 ```json
 {
-  "foo": [
-  {
-    "bar": 42,
-	"baz": true
-  }, {
-    "bar": 42,
-	"gizmo": "raygun"
-  }
+  "foo" : [
+    {
+      "bar" : 42,
+      "baz" : true,
+      "color" : null
+    },
+    {
+      "bar" : 42,
+      "gizmo" : "raygun",
+      "color" : "purple"
+    }
   ]
 }
 ```
@@ -120,11 +128,13 @@ extension Demo: Hashable {
 public struct Foo {
 	let bar: Int
 	let baz: Bool?
+	let color: String?
 	let gizmo: String?
 
 	init(_ dictionary: [String: Any]) {
 		self.bar = dictionary["bar"] as! Int
 		self.baz = dictionary["baz"] as? Bool
+		self.color = dictionary["color"] as? String
 		self.gizmo = dictionary["gizmo"] as? String
 	}
 }
@@ -133,6 +143,7 @@ extension Foo: Equatable {
  	public static func ==(x: Foo, y: Foo) -> Bool {
 		return x.bar == y.bar && 
 			x.baz == y.baz && 
+			x.color == y.color && 
 			x.gizmo == y.gizmo
 	} 
 }
@@ -141,6 +152,7 @@ extension Foo: Hashable {
  	public var hashValue: Int {
 		return bar.hashValue ^ 
 			(baz?.hashValue ?? 0) ^ 
+			(color?.hashValue ?? 0) ^ 
 			(gizmo?.hashValue ?? 0)
 	} 
 }
