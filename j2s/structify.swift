@@ -11,8 +11,8 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
             case .double(_): properties.insert(Property(name: name, type: "Double"))
             case .string(_): properties.insert(Property(name: name, type: "String"))
             case .null: properties.insert(Property(name: name, type: "NSNull"))
-            case .date(_): properties.insert(Property(name: name, type: "Date"))
-            case .url(_): properties.insert(Property(name: name, type: "URL"))
+            case .date(_, let format): properties.insert(Property(name: name, type: "Date", dateFormat: format))
+            case .url(_): properties.insert(Property(name: name, type: "URL", isURL: true))
             case .dictionary(let d):
                 properties.insert(Property(name: name, type: name.generatedClassName(), internetPrimitive: false))
                 structs.append(contentsOf: structify(name: name, json: d))
@@ -63,6 +63,7 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
                     if types.keys.count == 2 {
                         let hasInt = types.keys.reduce(false) { return $0 || $1.lowercased() == "int" }
                         let hasBool = types.keys.reduce(false) { return $0 || $1.lowercased() == "bool" }
+
                         if hasInt && hasBool {
                             properties.insert(Property(name: name, type: "[Int]", isArray: true))
                         } else {
@@ -89,11 +90,13 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
         if let existing = $0[$1.name.generatedClassName()] {
             let existsInBoth = $1.properties.intersection(existing.properties)
             let allProperties = $1.properties.union(existing.properties)
-            let optional = allProperties.subtracting(existsInBoth).map {
+            let optionalProperties = allProperties.subtracting(existsInBoth).map {
                 return Property(name: $0.name, type: $0.type, internetPrimitive: $0.internetPrimitive, isArray: $0.isArray, isOptional: true)
             }
 
-            structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: existsInBoth.union(optional))
+            // todo: if two Struct's have the same property but one type is `NSNull` and the other isn't, make the new property an Optional
+
+            structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: existsInBoth.union(optionalProperties))
         } else {
             structs[$1.name.generatedClassName()] = $1
         }
