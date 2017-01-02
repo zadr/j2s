@@ -9,6 +9,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var rootName: NSTextField!
     @IBOutlet weak var filePerStruct: NSButton!
     @IBOutlet weak var save: NSButton!
+
+    fileprivate var structs = [Struct]()
 }
 
 extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
@@ -51,10 +53,10 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
             }
 
             if let dictionary = parsed as? [String: Any] {
-                let structs = structify(name: rootElementName(), json: dictionary)
+                structs = structify(name: rootElementName(), json: dictionary)
                 output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             } else if let array = parsed as? [[String: Any]] {
-                let structs = array.map({ return structify(name: rootElementName(), json: $0) }).reduce([], +).merge()
+                structs = array.map({ return structify(name: rootElementName(), json: $0) }).reduce([], +).merge()
                 output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             }
         } catch let exception {
@@ -85,45 +87,34 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
     }
 
     @IBAction public func saveDocument(_ sender: Any) {
-        let data = input.string!.data(using: .utf8)!
-        do {
-            let parsed = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+        if !structs.isEmpty {
+            if filePerStruct.state == NSOnState {
+                let savePanel = NSOpenPanel()
+                savePanel.canCreateDirectories = true
+                savePanel.canChooseDirectories = true
+                savePanel.canChooseFiles = false
+                savePanel.prompt = "Save"
 
-            if let dictionary = parsed as? [String: Any] {
-                let structs = structify(name: rootElementName(), json: dictionary)
-
-                if !structs.isEmpty {
-                    if filePerStruct.state == NSOnState {
-                        let savePanel = NSOpenPanel()
-                        savePanel.canCreateDirectories = true
-                        savePanel.canChooseDirectories = true
-                        savePanel.canChooseFiles = false
-                        savePanel.prompt = "Save"
-
-                        savePanel.beginSheetModal(for: window) { choice in
-                            if choice == NSFileHandlingPanelOKButton, let url = savePanel.directoryURL {
-                                structs.forEach {
-                                    let url = url.appendingPathComponent($0.name.generatedClassName()).appendingPathExtension("swift")
-                                    return try! $0.description.write(to: url, atomically: true, encoding: .utf8)
-                                }
-                            }
-                        }
-                    } else {
-                        let savePanel = NSSavePanel()
-                        savePanel.canCreateDirectories = true
-                        savePanel.allowedFileTypes = [ "swift" ]
-                        savePanel.nameFieldStringValue = "Models.swift"
-
-                        savePanel.beginSheetModal(for: window) { choice in
-                            if choice == NSFileHandlingPanelOKButton, let url = savePanel.url {
-                                try! self.output.string!.write(to: url, atomically: true, encoding: .utf8)
-                            }
+                savePanel.beginSheetModal(for: window) { choice in
+                    if choice == NSFileHandlingPanelOKButton, let url = savePanel.directoryURL {
+                        self.structs.forEach {
+                            let url = url.appendingPathComponent($0.name.generatedClassName()).appendingPathExtension("swift")
+                            return try! $0.description.write(to: url, atomically: true, encoding: .utf8)
                         }
                     }
                 }
+            } else {
+                let savePanel = NSSavePanel()
+                savePanel.canCreateDirectories = true
+                savePanel.allowedFileTypes = [ "swift" ]
+                savePanel.nameFieldStringValue = "Models.swift"
+
+                savePanel.beginSheetModal(for: window) { choice in
+                    if choice == NSFileHandlingPanelOKButton, let url = savePanel.url {
+                        try! self.output.string!.write(to: url, atomically: true, encoding: .utf8)
+                    }
+                }
             }
-        } catch let exception {
-            print(exception)
         }
     }
 }
