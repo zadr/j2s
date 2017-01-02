@@ -82,7 +82,8 @@ public struct Struct: CustomStringConvertible {
                 return letString
             } else if $0.isArray && $0.isOptional {
                 var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.name.generatedClassName())($0) }"
+                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.type.generatedClassName())(\(parameterString)$0) }"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
                 letString += "\n\t\t}"
@@ -110,14 +111,16 @@ public struct Struct: CustomStringConvertible {
                 return letString
             } else if $0.isOptional {
                 var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.generatedClassName())(\($0.name.camelCased()))"
+                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
                 letString += "\n\t\t}"
                 return letString
             } else { // single non-optional object
                 var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.generatedClassName())(\($0.name.camelCased()))"
+                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
+                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\treturn nil"
                 letString += "\n\t\t}"
@@ -189,11 +192,13 @@ public struct Property: Equatable, Hashable {
     let isOptional: Bool
 
     let dateFormat: String
+    let initializerParameter: String
 
-    init(name: String, type: String, dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false) {
+    init(name: String, type: String, initializerParameter: String = "", dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false) {
         self.name = name
         self.type = type
         self.dateFormat = dateFormat
+        self.initializerParameter = initializerParameter
         self.internetPrimitive = internetPrimitive
         self.isArray = isArray
         self.isOptional = isOptional
@@ -203,6 +208,7 @@ public struct Property: Equatable, Hashable {
         return x.name == y.name &&
             x.type == y.type &&
             x.dateFormat == y.dateFormat &&
+            x.initializerParameter == y.initializerParameter &&
             x.internetPrimitive == y.internetPrimitive &&
             x.isArray == y.isArray &&
             x.isOptional == y.isOptional
@@ -212,6 +218,7 @@ public struct Property: Equatable, Hashable {
         return name.hashValue ^
             type.hashValue ^
             dateFormat.hashValue ^
+            initializerParameter.hashValue ^
             internetPrimitive.hashValue ^
             isArray.hashValue ^
             isOptional.hashValue

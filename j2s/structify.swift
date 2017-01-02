@@ -12,7 +12,7 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
             case .string(_): properties.insert(Property(name: name, type: "String"))
             case .null: properties.insert(Property(name: name, type: "NSNull"))
             case .date(_, let format): properties.insert(Property(name: name, type: "Date", dateFormat: format))
-            case .url(_): properties.insert(Property(name: name, type: "URL", internetPrimitive: false))
+            case .url(_): properties.insert(Property(name: name, type: "URL", initializerParameter: "string", internetPrimitive: false))
             case .dictionary(let d):
                 properties.insert(Property(name: name, type: name.generatedClassName(), internetPrimitive: false))
                 structs.append(contentsOf: structify(name: name, json: d))
@@ -104,11 +104,11 @@ extension Sequence where Iterator.Element == Struct {
                     if let existing = $0[$1.name] {
 
                         if existing.type == "NSNull" && $1.type != "NSNull" {
-                            properties[$1.name] = Property(name: $1.name, type: $1.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                            properties[$1.name] = Property(name: $1.name, type: $1.type, initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
                         } else if existing.type != "NSNull" && $1.type == "NSNull" {
-                            properties[$1.name] = Property(name: $1.name, type: existing.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                            properties[$1.name] = Property(name: $1.name, type: existing.type, initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
                         } else {
-                            properties[$1.name] = Property(name: $1.name, type: "Any", internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                            properties[$1.name] = Property(name: $1.name, type: "Any", initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
                         }
                     } else {
                         properties[$1.name] = $1
