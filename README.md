@@ -9,7 +9,9 @@ No, yeah, that's it. You give j2s json and it gives you Swift structs. You can p
 If you want to make it do anything else, you'll have to write some more code. I'll probably accept pull requests, but, you should probably look into other tools like [Sourcery](https://github.com/krzysztofzablocki/Sourcery) instead.
 
 ## Okay
-Oh. j2s will convert snake_case_key_names into camelCasePropertyNames, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/j2s.swift#L209) (exact line of code may change, but look around there for the algorithm).
+Oh. j2s will convert snake_case_key_names into camelCasePropertyNames, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/StringTransformations.swift#L14) (exact line of code may change, but look around there for the algorithm).
+
+And if your json value is a string that's secretly URL or a Date with a format that j2s understands, the generated code will use the correct (URL or Date) type.
 
 ## What version of Swift does this target?
 j2s.xcodeproj requires Swift 3 (Xcode 8 or greater) to build. The code it outputs also requires Swift 3, but only because generated `Equatable` implementations are in an `extension`.
