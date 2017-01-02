@@ -94,12 +94,29 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
                 return Property(name: $0.name, type: $0.type, internetPrimitive: $0.internetPrimitive, isArray: $0.isArray, isOptional: true)
             }
 
-            // todo: if two Struct's have the same property but one type is `NSNull` and the other isn't, make the new property an Optional
+            let uniqueProperties = existsInBoth.union(optionalProperties).reduce([String: Property]()) {
+                var properties = $0
+                if let existing = $0[$1.name] {
 
-            structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: existsInBoth.union(optionalProperties))
+                    if existing.type == "NSNull" && $1.type != "NSNull" {
+                        properties[$1.name] = Property(name: $1.name, type: $1.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                    } else if existing.type != "NSNull" && $1.type == "NSNull" {
+                        properties[$1.name] = Property(name: $1.name, type: existing.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                    } else {
+                        properties[$1.name] = Property(name: $1.name, type: "Any", internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                    }
+                } else {
+                    properties[$1.name] = $1
+                }
+
+                return properties
+            }
+
+            structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: Set(uniqueProperties.values))
         } else {
             structs[$1.name.generatedClassName()] = $1
         }
+
         return structs
     }).values.sorted(by: { (x, y) -> Bool in
         return x.name < y.name
