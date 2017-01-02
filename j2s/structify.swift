@@ -85,40 +85,46 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
 
     structs.append(Struct(name: name, properties: properties))
 
-    return structs.reduce([String: Struct](), {
-        var structs = $0
-        if let existing = $0[$1.name.generatedClassName()] {
-            let existsInBoth = $1.properties.intersection(existing.properties)
-            let allProperties = $1.properties.union(existing.properties)
-            let optionalProperties = allProperties.subtracting(existsInBoth).map {
-                return Property(name: $0.name, type: $0.type, internetPrimitive: $0.internetPrimitive, isArray: $0.isArray, isOptional: true)
-            }
+    return structs.merge()
+}
 
-            let uniqueProperties = existsInBoth.union(optionalProperties).reduce([String: Property]()) {
-                var properties = $0
-                if let existing = $0[$1.name] {
-
-                    if existing.type == "NSNull" && $1.type != "NSNull" {
-                        properties[$1.name] = Property(name: $1.name, type: $1.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
-                    } else if existing.type != "NSNull" && $1.type == "NSNull" {
-                        properties[$1.name] = Property(name: $1.name, type: existing.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
-                    } else {
-                        properties[$1.name] = Property(name: $1.name, type: "Any", internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
-                    }
-                } else {
-                    properties[$1.name] = $1
+extension Sequence where Iterator.Element == Struct {
+    func merge() -> [Struct] {
+        return reduce([String: Struct](), {
+            var structs = $0
+            if let existing = $0[$1.name.generatedClassName()] {
+                let existsInBoth = $1.properties.intersection(existing.properties)
+                let allProperties = $1.properties.union(existing.properties)
+                let optionalProperties = allProperties.subtracting(existsInBoth).map {
+                    return Property(name: $0.name, type: $0.type, internetPrimitive: $0.internetPrimitive, isArray: $0.isArray, isOptional: true)
                 }
 
-                return properties
+                let uniqueProperties = existsInBoth.union(optionalProperties).reduce([String: Property]()) {
+                    var properties = $0
+                    if let existing = $0[$1.name] {
+
+                        if existing.type == "NSNull" && $1.type != "NSNull" {
+                            properties[$1.name] = Property(name: $1.name, type: $1.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                        } else if existing.type != "NSNull" && $1.type == "NSNull" {
+                            properties[$1.name] = Property(name: $1.name, type: existing.type, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                        } else {
+                            properties[$1.name] = Property(name: $1.name, type: "Any", internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                        }
+                    } else {
+                        properties[$1.name] = $1
+                    }
+
+                    return properties
+                }
+
+                structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: Set(uniqueProperties.values))
+            } else {
+                structs[$1.name.generatedClassName()] = $1
             }
-
-            structs[$1.name.generatedClassName()] = Struct(name: $1.name, properties: Set(uniqueProperties.values))
-        } else {
-            structs[$1.name.generatedClassName()] = $1
-        }
-
-        return structs
-    }).values.sorted(by: { (x, y) -> Bool in
-        return x.name < y.name
-    })
+            
+            return structs
+        }).values.sorted(by: { (x, y) -> Bool in
+            return x.name < y.name
+        })
+    }
 }

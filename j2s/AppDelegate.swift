@@ -53,6 +53,9 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
             if let dictionary = parsed as? [String: Any] {
                 let structs = structify(name: rootElementName(), json: dictionary)
                 output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
+            } else if let array = parsed as? [[String: Any]] {
+                let structs = array.map({ return structify(name: rootElementName(), json: $0) }).reduce([], +).merge()
+                output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             }
         } catch let exception {
             if data.isEmpty {
@@ -129,6 +132,7 @@ extension AppDelegate {
     fileprivate func rootElementName() -> String {
         return rootName.stringValue.isEmpty ? "Root" : rootName.stringValue
     }
+
     fileprivate func open(_ url: URL) {
         do {
             if self.prettyPrint.state == NSOnState {
@@ -151,4 +155,3 @@ extension AppDelegate {
         }
     }
 }
-
