@@ -143,12 +143,12 @@ public struct Struct: CustomStringConvertible {
             if $0.isArray {
                 if $0.isOptional {
                     var arrayEquation = "(x.\($0.name.camelCased())?.count ?? 0) == (y.\($0.name.camelCased())?.count ?? 0) && "
-                    arrayEquation += "\n\t\t\t\t(0 ..< (x.\($0.name.camelCased())?.count ?? 0)).reduce(false, { $0 || x.\($0.name.camelCased())?[$1] == y.\($0.name.camelCased())?[$1] })"
+                    arrayEquation += "\n\t\t\t\t(0 ..< (x.\($0.name.camelCased())?.count ?? 0)).reduce(true, { $0 && x.\($0.name.camelCased())?[$1] == y.\($0.name.camelCased())?[$1] })"
                     return arrayEquation
                 }
 
                 var arrayEquation = "x.\($0.name.camelCased()).count == y.\($0.name.camelCased()).count && "
-                arrayEquation += "\n\t\t\t\t(0 ..< x.\($0.name.camelCased()).count).reduce(false, { $0 || x.\($0.name.camelCased())[$1] == y.\($0.name.camelCased())[$1] })"
+                arrayEquation += "\n\t\t\t\t(0 ..< x.\($0.name.camelCased()).count).reduce(true, { $0 && x.\($0.name.camelCased())[$1] == y.\($0.name.camelCased())[$1] })"
                 return arrayEquation
             }
 

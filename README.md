@@ -64,7 +64,7 @@ extension Demo: Equatable {
  	public static func ==(x: Demo, y: Demo) -> Bool {
 		return x.what == y.what && 
 			x.whatIfIWantTo.count == y.whatIfIWantTo.count && 
-				(0 ..< x.whatIfIWantTo.count).reduce(false, { $0 || x.whatIfIWantTo[$1] == y.whatIfIWantTo[$1] }) && 
+				(0 ..< x.whatIfIWantTo.count).reduce(true, { $0 && x.whatIfIWantTo[$1] == y.whatIfIWantTo[$1] }) && 
 			x.why == y.why
 	} 
 }
@@ -125,7 +125,7 @@ public struct Demo {
 extension Demo: Equatable {
  	public static func ==(x: Demo, y: Demo) -> Bool {
 		return x.foo.count == y.foo.count && 
-				(0 ..< x.foo.count).reduce(false, { $0 || x.foo[$1] == y.foo[$1] })
+				(0 ..< x.foo.count).reduce(true, { $0 && x.foo[$1] == y.foo[$1] })
 	} 
 }
 
