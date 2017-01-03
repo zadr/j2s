@@ -46,7 +46,7 @@ public struct Demo {
 			return nil
 		}
 		
-		if let whatIfIWantTo = dictionary["what_if_i_want_to"] as? [[String]] {
+		if let whatIfIWantTo = dictionary["what_if_i_want_to"] as? [String] {
 			self.whatIfIWantTo = whatIfIWantTo
 		} else {
 			return nil

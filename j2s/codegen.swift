@@ -74,7 +74,7 @@ public struct Struct: CustomStringConvertible {
                     return letString
                 }
             } else if $0.isArray && $0.isOptional && $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [\($0.type)] {"
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
@@ -89,7 +89,7 @@ public struct Struct: CustomStringConvertible {
                 letString += "\n\t\t}"
                 return letString
             } else if $0.isArray && $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [\($0.type)] {"
+                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\treturn nil"
