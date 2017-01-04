@@ -11,10 +11,12 @@ If you want to make it do anything else, you'll have to write some more code. I'
 ## Okay
 Oh. j2s will convert snake_case_key_names into camelCasePropertyNames, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/StringTransformations.swift#L14) (exact line of code may change, but look around there for the algorithm).
 
-And if your json value is a string that's secretly URL or a Date with a format that j2s understands, the generated code will use the correct (URL or Date) type.
+And, if your json value is a string that's secretly `URL`s (like `https://github.com/zadr/j2s`), a `Date` in a format that j2s understands (like `Sat Dec 31 04:27:14 +0000 2016`), or a `Locale` (in [BCP47](https://tools.ietf.org/html/bcp47) format, ex: `en-US` or `es_ES`), the generated code will use the correct (`URL`, `Date` or `Locale`) type.
+
+Also, an `Int` like `5` is an `Int` and a floating point number like `5.0` is a `Double`. Because, you know, thats how these things should work.
 
 ## What version of Swift does this target?
-j2s.xcodeproj requires Swift 3 (Xcode 8 or greater) to build. The code it outputs also requires Swift 3, but only because generated `Equatable` implementations are in an `extension`.
+j2s.xcodeproj requires Swift 3 (Xcode 8 or greater) to build. The code it outputs also requires Swift 3.
 
 ## What's the generated code look like?
 
