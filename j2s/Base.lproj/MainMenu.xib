@@ -387,16 +387,16 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uE5-tO-YPB">
-                        <rect key="frame" x="0.0" y="44" width="336" height="460"/>
+                        <rect key="frame" x="0.0" y="44" width="302" height="460"/>
                         <clipView key="contentView" id="xFa-su-JIT">
-                            <rect key="frame" x="1" y="1" width="334" height="458"/>
+                            <rect key="frame" x="1" y="1" width="300" height="458"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" findStyle="panel" allowsUndo="YES" allowsNonContiguousLayout="YES" id="W9w-ic-cg0">
-                                    <rect key="frame" x="0.0" y="0.0" width="334" height="458"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="458"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="334" height="458"/>
+                                    <size key="minSize" width="300" height="458"/>
                                     <size key="maxSize" width="510" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment>
@@ -420,21 +420,21 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="ge1-uE-CSL">
-                            <rect key="frame" x="319" y="1" width="16" height="458"/>
+                            <rect key="frame" x="285" y="1" width="16" height="458"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
                     <scrollView wantsLayer="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qAi-kZ-bSd">
-                        <rect key="frame" x="336" y="44" width="336" height="460"/>
+                        <rect key="frame" x="302" y="44" width="370" height="460"/>
                         <clipView key="contentView" id="cTi-fw-Og9">
-                            <rect key="frame" x="1" y="1" width="334" height="458"/>
+                            <rect key="frame" x="1" y="1" width="368" height="458"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" allowsCharacterPickerTouchBarItem="NO" usesRuler="YES" allowsNonContiguousLayout="YES" linkDetection="YES" textCompletion="NO" id="zcY-gy-e67">
-                                    <rect key="frame" x="0.0" y="0.0" width="334" height="458"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="368" height="458"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <size key="minSize" width="334" height="458"/>
+                                    <size key="minSize" width="368" height="458"/>
                                     <size key="maxSize" width="522" height="10000000"/>
                                     <attributedString key="textStorage">
                                         <fragment content="text">
@@ -454,7 +454,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="8gx-T9-3Bd">
-                            <rect key="frame" x="319" y="1" width="16" height="458"/>
+                            <rect key="frame" x="353" y="1" width="16" height="458"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -498,12 +498,12 @@
                     <constraint firstAttribute="bottom" secondItem="qAi-kZ-bSd" secondAttribute="bottom" constant="44" id="57e-uZ-D4U"/>
                     <constraint firstAttribute="trailing" secondItem="gvO-nF-DM2" secondAttribute="trailing" constant="20" id="5Sh-ES-tYA"/>
                     <constraint firstAttribute="trailing" secondItem="qAi-kZ-bSd" secondAttribute="trailing" id="6Wb-RU-7Et"/>
-                    <constraint firstItem="qAi-kZ-bSd" firstAttribute="width" secondItem="EiT-Mj-1SZ" secondAttribute="width" multiplier="0.5:1" id="8u9-pb-bNS"/>
+                    <constraint firstItem="qAi-kZ-bSd" firstAttribute="width" secondItem="EiT-Mj-1SZ" secondAttribute="width" multiplier="0.55:1" id="8u9-pb-bNS"/>
                     <constraint firstItem="uE5-tO-YPB" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="Oge-8u-ij0"/>
                     <constraint firstItem="uE5-tO-YPB" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="OrV-G3-fBL"/>
                     <constraint firstItem="gvO-nF-DM2" firstAttribute="leading" secondItem="TDJ-uA-XW1" secondAttribute="trailing" constant="8" id="R9s-gQ-0Th"/>
                     <constraint firstItem="MnB-QM-A8V" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="SYO-Rk-sPD"/>
-                    <constraint firstItem="uE5-tO-YPB" firstAttribute="width" secondItem="EiT-Mj-1SZ" secondAttribute="width" multiplier="0.5:1" id="VRc-iZ-HbA"/>
+                    <constraint firstItem="uE5-tO-YPB" firstAttribute="width" secondItem="EiT-Mj-1SZ" secondAttribute="width" multiplier="0.45:1" id="VRc-iZ-HbA"/>
                     <constraint firstAttribute="bottom" secondItem="uE5-tO-YPB" secondAttribute="bottom" constant="44" id="XnT-eC-bjP"/>
                     <constraint firstAttribute="bottom" secondItem="MnB-QM-A8V" secondAttribute="bottom" constant="12" id="YX7-bb-0lw"/>
                     <constraint firstAttribute="bottom" secondItem="EGa-c5-wBi" secondAttribute="bottom" constant="16" id="g0s-Xh-BgU"/>
