@@ -101,7 +101,7 @@ internal extension String {
             let initial = camelCased.substring(with: nextRange)
             camelCased.replaceSubrange(replacementRange, with: initial.uppercased())
         }
-        
-        return camelCased
+
+        return camelCased.isEmpty ? "/* \(self) */ invalidKey" : camelCased
     }
 }
