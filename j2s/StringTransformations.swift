@@ -94,7 +94,9 @@ internal extension String {
         while camelCased.contains("_") {
             let range = camelCased.range(of: "_")!
             let underlineRange = (range.lowerBound ..< range.upperBound)
-            let nextRange = (underlineRange.upperBound ..< camelCased.index(after: underlineRange.upperBound))
+
+            let endOfNextRange = underlineRange.upperBound == camelCased.endIndex ? camelCased.endIndex : camelCased.index(after: underlineRange.upperBound)
+            let nextRange = (underlineRange.upperBound ..< endOfNextRange)
             let replacementRange = (underlineRange.lowerBound ..< nextRange.upperBound).clamped(to: (underlineRange.lowerBound ..< camelCased.endIndex))
             let initial = camelCased.substring(with: nextRange)
             camelCased.replaceSubrange(replacementRange, with: initial.uppercased())
