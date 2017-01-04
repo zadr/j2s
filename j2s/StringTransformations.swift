@@ -78,7 +78,18 @@ internal extension String {
     func camelCased() -> String {
         if isEmpty { return "" }
 
+        var characterSet = CharacterSet.alphanumerics
+        characterSet.formUnion(CharacterSet(charactersIn: "[]_"))
+        let invalidCharacterSet = characterSet.inverted
+
         var camelCased = self
+        while true {
+            guard let range = camelCased.rangeOfCharacter(from: invalidCharacterSet) else {
+                break
+            }
+
+            camelCased.replaceSubrange(range, with: "_")
+        }
 
         while camelCased.contains("_") {
             let range = camelCased.range(of: "_")!
