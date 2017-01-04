@@ -259,6 +259,8 @@ public enum JSON {
                 self = .date(date, dateFormatter.dateFormat)
             } else if let url = URL(string: string), !(url.scheme ?? "").isEmpty {
                 self = .url(url)
+            } else if string.isBCP47Identifier  {
+                self = .locale(Locale(identifier: string))
             } else {
                 self = .string(string)
             }
@@ -279,6 +281,7 @@ public enum JSON {
     case string(String)
     case date(Date, String)
     case url(URL)
+    case locale(Locale)
     case array([Any])
     case dictionary([String: Any])
     case null
@@ -291,6 +294,7 @@ public enum JSON {
         case .string(_): return "String"
         case .date(_, _): return "Date"
         case .url(_): return "URL"
+        case .locale(_): return "Locale"
         case .array(_): return "Array"
         case .dictionary(_): return "Dictionary"
         case .null: return "null"
