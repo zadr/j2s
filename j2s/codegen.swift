@@ -233,12 +233,27 @@ private let dateFormatter: DateFormatter = {
 
 public enum JSON {
     init?(value: Any) {
-        if let int = value as? Int {
-            self = .int(int)
-        } else if let bool = value as? Bool {
-            self = .bool(bool)
-        } else if let double = value as? Double {
-            self = .double(double)
+        if let number = value as? NSNumber {
+            switch CFNumberGetType(number) {
+            case .charType: self = .bool(value as! Bool)
+
+            case .shortType: fallthrough
+            case .sInt8Type: fallthrough
+            case .sInt16Type: fallthrough
+            case .sInt32Type: fallthrough
+            case .intType: fallthrough
+            case .longType: fallthrough
+            case .cfIndexType: fallthrough
+            case .sInt64Type: fallthrough
+            case .longLongType: fallthrough
+            case .nsIntegerType: self = .int(value as! Int)
+
+            case .floatType: fallthrough
+            case .float32Type: fallthrough
+            case .float64Type: fallthrough
+            case .doubleType: fallthrough
+            case .cgFloatType: self = .double(value as! Double)
+            }
         } else if let string = value as? String {
             if let date = dateFormatter.date(from: string) {
                 self = .date(date, dateFormatter.dateFormat)
