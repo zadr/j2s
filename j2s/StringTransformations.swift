@@ -19,7 +19,10 @@ internal extension String {
             return name.substring(to: name.index(name.endIndex, offsetBy: -4)).appending("y")
         }
         if name.hasSuffix("ices") {
-            // fails for ix, eg: matrix
+            if [ "matrices" ].contains(name) {
+                return "matrix"
+            }
+
             return name.substring(to: name.index(name.endIndex, offsetBy: -4)).appending("ex")
         }
         if name.hasSuffix("eaux") || name.hasSuffix("eaus") {
@@ -35,7 +38,10 @@ internal extension String {
             return name.substring(to: name.index(before: name.endIndex))
         }
         if name.hasSuffix("ies") {
-            // list of words not to change; series, species
+            if [ "series", "species" ].contains(name) {
+                return name
+            }
+
             return name.substring(to: name.index(name.endIndex, offsetBy: -3)).appending("y")
         }
         if name.hasSuffix("ses") {
@@ -45,6 +51,7 @@ internal extension String {
             if name == "houses" {
                 return "house"
             }
+
             return name.substring(to: name.index(before: name.endIndex))
         }
         if name.hasSuffix("ae") {
@@ -54,7 +61,18 @@ internal extension String {
             return name.substring(to: name.endIndex).appending("a")
         }
         if name.hasSuffix("us") {
-            // fails for eg: genus -> genera or corpus -> corpora, status
+            if [ "status" ].contains(name) {
+                return name
+            }
+
+            if [ "corpus" ].contains(name) {
+                return name.substring(to: name.index(before: name.endIndex)).appending("ora")
+            }
+
+            if [ "genus" ].contains(name) {
+                return name.substring(to: name.index(before: name.endIndex)).appending("era")
+            }
+
             return name.substring(to: name.index(before: name.endIndex)).appending("i")
         }
         if name.hasSuffix("en") {
