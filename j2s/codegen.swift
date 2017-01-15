@@ -23,8 +23,9 @@ public struct Struct: CustomStringConvertible {
             d += "\n\(initCode)\n"
             d += "}\n"
             d += "\nextension \(typeName): Equatable {\n \(equatableCode) \n}\n"
-            d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n}"
+            d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n"
         }
+        d += "}"
         return d
     }
 
