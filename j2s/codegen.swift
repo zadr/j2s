@@ -214,11 +214,13 @@ public struct Property: Equatable, Hashable {
     }
 }
 
-private let dateFormatter: DateFormatter = {
-    var f: DateFormatter = DateFormatter()
-    f.dateFormat = "eee MMM dd HH:mm:ss Z yyyy"
-    return f
-}()
+private let dateFormatters: [DateFormatter] = [
+    {
+        var f: DateFormatter = DateFormatter()
+        f.dateFormat = "eee MMM dd HH:mm:ss Z yyyy"
+        return f
+    }()
+]
 
 public enum JSON {
     init?(value: Any) {
@@ -244,9 +246,14 @@ public enum JSON {
             case .cgFloatType: self = .double(value as! Double)
             }
         } else if let string = value as? String {
-            if let date = dateFormatter.date(from: string) {
-                self = .date(date, dateFormatter.dateFormat)
-            } else if let url = URL(string: string), !(url.scheme ?? "").isEmpty {
+            for dateFormatter in dateFormatters {
+                if let date = dateFormatter.date(from: string) {
+                    self = .date(date, dateFormatter.dateFormat)
+                    return
+                }
+            }
+
+            if let url = URL(string: string), !(url.scheme ?? "").isEmpty {
                 self = .url(url)
             } else if string.isBCP47Identifier  {
                 self = .locale(Locale(identifier: string))
