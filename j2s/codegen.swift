@@ -82,7 +82,12 @@ public struct Struct: CustomStringConvertible {
                 letString += "\n\t\t}"
                 return letString
             } else if $0.isArray && $0.isOptional {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
+                var letString = ""
+                if $0.isStringEnahancement {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String] {"
+                } else {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
+                }
                 let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.type.generatedClassName())(\(parameterString)$0) }"
                 letString += "\n\t\t} else {"
@@ -111,7 +116,12 @@ public struct Struct: CustomStringConvertible {
                 letString += "\n\t\t}"
                 return letString
             } else if $0.isOptional {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                var letString = ""
+                if $0.isStringEnahancement {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                } else {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                }
                 let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
                 letString += "\n\t\t} else {"
@@ -119,7 +129,12 @@ public struct Struct: CustomStringConvertible {
                 letString += "\n\t\t}"
                 return letString
             } else { // single non-optional object
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                var letString = ""
+                if $0.isStringEnahancement {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                } else {
+                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                }
                 let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
                 letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
                 letString += "\n\t\t} else {"
@@ -179,11 +194,12 @@ public struct Property: Equatable, Hashable {
     let internetPrimitive: Bool
     let isArray: Bool
     let isOptional: Bool
+    let isStringEnahancement: Bool
 
     let dateFormat: String
     let initializerParameter: String
 
-    init(name: String, type: String, initializerParameter: String = "", dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false) {
+    init(name: String, type: String, initializerParameter: String = "", dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false, isStringEnahancement: Bool = false) {
         self.name = name
         self.type = type
         self.dateFormat = dateFormat
@@ -191,6 +207,7 @@ public struct Property: Equatable, Hashable {
         self.internetPrimitive = internetPrimitive
         self.isArray = isArray
         self.isOptional = isOptional
+        self.isStringEnahancement = isStringEnahancement
     }
 
     public static func ==(x: Property, y: Property) -> Bool {
@@ -200,7 +217,8 @@ public struct Property: Equatable, Hashable {
             x.initializerParameter == y.initializerParameter &&
             x.internetPrimitive == y.internetPrimitive &&
             x.isArray == y.isArray &&
-            x.isOptional == y.isOptional
+            x.isOptional == y.isOptional &&
+            x.isStringEnahancement == y.isStringEnahancement
     }
 
     public var hashValue: Int {
@@ -210,7 +228,8 @@ public struct Property: Equatable, Hashable {
             initializerParameter.hashValue ^
             internetPrimitive.hashValue ^
             isArray.hashValue ^
-            isOptional.hashValue
+            isOptional.hashValue ^
+            isStringEnahancement.hashValue
     }
 }
 

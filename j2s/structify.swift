@@ -12,8 +12,8 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
             case .string(_): properties.insert(Property(name: name, type: "String"))
             case .null: properties.insert(Property(name: name, type: "NSNull"))
             case .date(_, let format): properties.insert(Property(name: name, type: "Date", dateFormat: format))
-            case .url(_): properties.insert(Property(name: name, type: "URL", initializerParameter: "string", internetPrimitive: false))
-            case .locale(_): properties.insert(Property(name: name, type: "Locale", initializerParameter: "identifier", internetPrimitive: false))
+            case .url(_): properties.insert(Property(name: name, type: "URL", initializerParameter: "string", internetPrimitive: false, isStringEnahancement: true))
+            case .locale(_): properties.insert(Property(name: name, type: "Locale", initializerParameter: "identifier", internetPrimitive: false, isStringEnahancement: true))
             case .dictionary(let d):
                 properties.insert(Property(name: name, type: name.generatedClassName(), internetPrimitive: false))
                 structs.append(contentsOf: structify(name: name, json: d))
