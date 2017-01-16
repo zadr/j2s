@@ -7,7 +7,7 @@ private let BCP47Regex = try! NSRegularExpression(pattern: BCP47RegexPattern, op
 
 extension String {
     var isBCP47Identifier: Bool {
-        let range = NSMakeRange(0, self.utf8.count)
+        let range = NSMakeRange(0, self.utf16.count)
         return BCP47Regex.numberOfMatches(in: self, options: .reportCompletion, range: range) > 0
     }
 }
