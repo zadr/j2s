@@ -7,12 +7,13 @@ public struct Struct: CustomStringConvertible {
     public var description: String {
         let typeName = name.generatedClassName()
         var d = ""
-        properties.filter {
-            return !$0.dateFormat.isEmpty
+        properties.flatMap { (json) -> String? in
+            if case .date(_, let format) = json.underlying { return format }
+            return nil
         } .forEach {
-            d += "\nprivate let \(typeName)DateFormatter\(abs($0.dateFormat.hashValue)): DateFormatter = {"
+            d += "\nprivate let \(typeName)DateFormatter\(abs($0.hashValue)): DateFormatter = {"
             d += "\n\tvar dateFormatter = DateFormatter()"
-            d += "\n\tdateFormatter.dateFormat = \"\($0.dateFormat)\""
+            d += "\n\tdateFormatter.dateFormat = \"\($0)\""
             d += "\n\treturn dateFormatter"
             d += "\n}()\n\n"
         }
@@ -23,9 +24,10 @@ public struct Struct: CustomStringConvertible {
             d += "\n\(initCode)\n"
             d += "}\n"
             d += "\nextension \(typeName): Equatable {\n \(equatableCode) \n}\n"
-            d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n"
+            d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n}\n"
+        } else {
+            d += "}\n"
         }
-        d += "}"
         return d
     }
 
@@ -48,95 +50,98 @@ public struct Struct: CustomStringConvertible {
 
     private var initInitializationCode: String {
         let sorted = properties.sorted(by: { x, y in return x.name < y.name })
-        let lets: [String] = sorted.map {
-            if !$0.dateFormat.isEmpty {
-                if $0.isArray && $0.isOptional {
-                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String] {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap {"
-                    letString += "\n\t\t\t\treturn \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: $0)"
+        let lets: [String] = sorted.map { (property) in
+            if case .date(_, let format) = property.underlying {
+                if property.underlying.isArray && property.isOptional {
+                    var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? [String] {"
+                    letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased()).flatMap {"
+                    letString += "\n\t\t\t\treturn \(name.generatedClassName())DateFormatter\(abs(format.hashValue)).date(from: $0)"
                     letString += "\n\t\t\t}"
                     letString += "\n\t\t} else {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                    letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                     letString += "\n\t\t\t}"
                     return letString
-                } else if $0.isOptional {
-                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: \($0.name.camelCased()))"
+                } else if property.isOptional {
+                    var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? String {"
+                    letString += "\n\t\t\tself.\(property.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs(format.hashValue)).date(from: \(property.name.camelCased()))"
                     letString += "\n\t\t} else {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                    letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                     letString += "\n\t\t}"
                     return letString
                 } else {
-                    var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
-                    letString += "\n\t\t\tself.\($0.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs($0.dateFormat.hashValue)).date(from: \($0.name.camelCased()))"
+                    var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? String {"
+                    letString += "\n\t\t\tself.\(property.name.camelCased()) = \(name.generatedClassName())DateFormatter\(abs(format.hashValue)).date(from: \(property.name.camelCased()))"
                     letString += "\n\t\t} else {"
                     letString += "\n\t\t\treturn nil"
                     letString += "\n\t\t}"
                     return letString
                 }
-            } else if $0.isArray && $0.isOptional && $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+            } else if property.underlying.isArray && property.isOptional && !property.underlying.isComplexType {
+                var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? \(property.type) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased())"
                 letString += "\n\t\t} else {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                 letString += "\n\t\t}"
                 return letString
-            } else if $0.isArray && $0.isOptional {
+            } else if property.underlying.isArray && property.isOptional {
                 var letString = ""
-                if $0.isStringEnahancement {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String] {"
+                if property.underlying.isStringEnhancement {
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? [String] {"
                 } else {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [[String: Any]] {"
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? [[String: Any]] {"
                 }
-                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased()).flatMap { return \($0.type.generatedClassName())(\(parameterString)$0) }"
+                let parameterString = property.underlying.initializerParameter.isEmpty ? "" : "\(property.underlying.initializerParameter): "
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased()).flatMap { return \(property.type.generatedClassName())(\(parameterString)$0) }"
                 letString += "\n\t\t} else {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                 letString += "\n\t\t}"
                 return letString
-            } else if $0.isArray && $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+            } else if property.underlying.isArray && !property.underlying.isComplexType {
+                var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? \(property.type) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased())"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\treturn nil"
                 letString += "\n\t\t}"
                 return letString
-            } else if $0.isOptional && $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+            } else if property.isOptional && !property.underlying.isComplexType {
+                var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? \(property.type) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased())"
                 letString += "\n\t\t} else {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                 letString += "\n\t\t}"
                 return letString
-            } else if $0.internetPrimitive {
-                var letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? \($0.type) {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.name.camelCased())"
+            } else if !property.underlying.isComplexType {
+                var letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? \(property.type) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = \(property.name.camelCased())"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\treturn nil"
                 letString += "\n\t\t}"
                 return letString
-            } else if $0.isOptional {
+            } else if property.isOptional {
                 var letString = ""
-                if $0.isStringEnahancement {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                if property.underlying.isStringEnhancement {
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? String, "
                 } else {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? [String: Any], "
                 }
-                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
+
+                let parameterString = property.underlying.initializerParameter.isEmpty ? "" : "\(property.underlying.initializerParameter): "
+                letString += "\n\t\t\tlet _\(property.name.camelCased()) = \(property.type.generatedClassName())(\(parameterString)\(property.name.camelCased())) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = _\(property.name.camelCased())"
                 letString += "\n\t\t} else {"
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = nil"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = nil"
                 letString += "\n\t\t}"
                 return letString
             } else { // single non-optional object
                 var letString = ""
-                if $0.isStringEnahancement {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? String {"
+                if property.underlying.isStringEnhancement {
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? String, "
                 } else {
-                    letString = "\n\t\tif let \($0.name.camelCased()) = dictionary[\"\($0.name)\"] as? [String: Any] {"
+                    letString = "\n\t\tif let \(property.name.camelCased()) = dictionary[\"\(property.name)\"] as? [String: Any], "
                 }
-                let parameterString = $0.initializerParameter.isEmpty ? "" : "\($0.initializerParameter): "
-                letString += "\n\t\t\tself.\($0.name.camelCased()) = \($0.type.generatedClassName())(\(parameterString)\($0.name.camelCased()))"
+                let parameterString = property.underlying.initializerParameter.isEmpty ? "" : "\(property.underlying.initializerParameter): "
+                letString += "\n\t\t\tlet _\(property.name.camelCased()) = \(property.type.generatedClassName())(\(parameterString)\(property.name.camelCased())) {"
+                letString += "\n\t\t\tself.\(property.name.camelCased()) = _\(property.name.camelCased())"
                 letString += "\n\t\t} else {"
                 letString += "\n\t\t\treturn nil"
                 letString += "\n\t\t}"
@@ -167,7 +172,7 @@ public struct Struct: CustomStringConvertible {
         var hashable = "\tpublic var hashValue: Int {\n\t\treturn "
         let sorted = properties.sorted(by: { x, y in return x.name < y.name })
         let hashables: [String] = sorted.map {
-            if $0.isArray {
+            if $0.underlying.isArray {
                 if $0.isOptional {
                     return "(\($0.name.camelCased())?.reduce(0, { return 33 &* $0 ^ $1.hashValue }) ?? 0)"
                 }
@@ -191,45 +196,28 @@ public struct Property: Equatable, Hashable {
     let name: String
     let type: String
 
-    let internetPrimitive: Bool
-    let isArray: Bool
+    let underlying: JSON
     let isOptional: Bool
-    let isStringEnahancement: Bool
 
-    let dateFormat: String
-    let initializerParameter: String
-
-    init(name: String, type: String, initializerParameter: String = "", dateFormat: String = "", internetPrimitive: Bool = true, isArray: Bool = false, isOptional: Bool = false, isStringEnahancement: Bool = false) {
+    init(name: String, type: String, isOptional: Bool = false, underlying: JSON) {
         self.name = name
         self.type = type
-        self.dateFormat = dateFormat
-        self.initializerParameter = initializerParameter
-        self.internetPrimitive = internetPrimitive
-        self.isArray = isArray
+        self.underlying = underlying
         self.isOptional = isOptional
-        self.isStringEnahancement = isStringEnahancement
     }
 
     public static func ==(x: Property, y: Property) -> Bool {
         return x.name == y.name &&
             x.type == y.type &&
-            x.dateFormat == y.dateFormat &&
-            x.initializerParameter == y.initializerParameter &&
-            x.internetPrimitive == y.internetPrimitive &&
-            x.isArray == y.isArray &&
-            x.isOptional == y.isOptional &&
-            x.isStringEnahancement == y.isStringEnahancement
+            x.underlying == y.underlying &&
+            x.isOptional == y.isOptional
     }
 
     public var hashValue: Int {
         return name.hashValue ^
             type.hashValue ^
-            dateFormat.hashValue ^
-            initializerParameter.hashValue ^
-            internetPrimitive.hashValue ^
-            isArray.hashValue ^
             isOptional.hashValue ^
-            isStringEnahancement.hashValue
+            underlying.hashValue
     }
 }
 
@@ -315,13 +303,67 @@ public enum JSON {
         case .null: return "null"
         }
     }
+
+    var isArray: Bool {
+        switch self {
+        case .array(_): return true
+        default: return false
+        }
+    }
+
+    var isStringEnhancement: Bool {
+        switch self {
+        case .url(_): return true
+        case .locale(_): return true
+        default: return false
+        }
+    }
+
+    var isComplexType: Bool {
+        switch self {
+        case .dictionary(_): return true
+        default: return false
+        }
+    }
+
+    var initializerParameter: String {
+        switch self {
+        case .url(_): return "string"
+        case .locale(_): return "localeIdentifier"
+        default: return ""
+        }
+    }
 }
 
 extension JSON: Hashable, Equatable {
-    public var hashValue: Int { return type.hashValue }
+    public var hashValue: Int {
+        switch self {
+        case .bool(let x): return x.hashValue
+        case .int(let x): return x.hashValue
+        case .string(let x): return x.hashValue
+        case .date(let x1, let x2): return x1.hashValue ^ x2.hashValue
+        case .url(let x): return x.hashValue
+        case .locale(let x): return x.hashValue
+        case .array(_): return type.hashValue
+        case .dictionary(_): return type.hashValue
+        case .null: return type.hashValue
+        default: return 0
+        }
+    }
 
-    // this is wrong in the general sene, but right for what we use this for during codegen
+    // this isn't always right in the general sene, but it's usually right enough for what we use it for during codegen
     public static func ==(x: JSON, y: JSON) -> Bool {
-        return x.type == y.type
+        switch (x, y) {
+        case (.bool(let x), .bool(let y)): return x == y
+        case (.int(let x), .int(let y)): return x == y
+        case (.string(let x), .string(let y)): return x == y
+        case (.date(let x1, let x2), .date(let y1, let y2)): return x1 == y1 && x2 == y2
+        case (.url(let x), .url(let y)): return x == y
+        case (.locale(let x), .locale(let y)): return x == y
+        case (.array(_), .array(_)): return true
+        case (.dictionary(_), .dictionary(_)): return true
+        case (.null, .null): return x == y
+        default: return false
+        }
     }
 }

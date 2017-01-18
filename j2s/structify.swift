@@ -6,16 +6,16 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
         var handleJSON: ((String, JSON) -> String?)? = nil
         handleJSON = { (name, json) in
             switch json {
-            case .bool(_): properties.insert(Property(name: name, type: "Bool"))
-            case .int(_): properties.insert(Property(name: name, type: "Int"))
-            case .double(_): properties.insert(Property(name: name, type: "Double"))
-            case .string(_): properties.insert(Property(name: name, type: "String"))
-            case .null: properties.insert(Property(name: name, type: "NSNull"))
-            case .date(_, let format): properties.insert(Property(name: name, type: "Date", dateFormat: format))
-            case .url(_): properties.insert(Property(name: name, type: "URL", initializerParameter: "string", internetPrimitive: false, isStringEnahancement: true))
-            case .locale(_): properties.insert(Property(name: name, type: "Locale", initializerParameter: "identifier", internetPrimitive: false, isStringEnahancement: true))
+            case .bool(_): properties.insert(Property(name: name, type: "Bool", underlying: json))
+            case .int(_): properties.insert(Property(name: name, type: "Int", underlying: json))
+            case .double(_): properties.insert(Property(name: name, type: "Double", underlying: json))
+            case .string(_): properties.insert(Property(name: name, type: "String", underlying: json))
+            case .null: properties.insert(Property(name: name, type: "NSNull", underlying: json))
+            case .date(_, _): properties.insert(Property(name: name, type: "Date", underlying: json))
+            case .url(_): properties.insert(Property(name: name, type: "URL", underlying: json))
+            case .locale(_): properties.insert(Property(name: name, type: "Locale", underlying: json))
             case .dictionary(let d):
-                properties.insert(Property(name: name, type: name.generatedClassName(), internetPrimitive: false))
+                properties.insert(Property(name: name, type: name.generatedClassName(), underlying: json))
                 structs.append(contentsOf: structify(name: name, json: d))
             case .array(let a):
                 var types = [String: Int]()
@@ -37,42 +37,43 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
 
                         switch json {
                         case .bool(_):
-                            properties.insert(Property(name: name, type: "[Bool]", isArray: true))
+                            properties.insert(Property(name: name, type: "[Bool]", underlying: json))
                         case .int(_):
-                            properties.insert(Property(name: name, type: "[Int]", isArray: true))
-                        case .double(_): properties.insert(Property(name: name, type: "[Double]", isArray: true))
-                        case .string(_): properties.insert(Property(name: name, type: "[String]", isArray: true))
-                        case .date(_): properties.insert(Property(name: name, type: "[Date]", isArray: true))
-                        case .url(_):  properties.insert(Property(name: name, type: "[URL]", initializerParameter: "string", internetPrimitive: false, isArray: true))
-                        case .locale(_): properties.insert(Property(name: name, type: "[Locale]", initializerParameter: "identifier", internetPrimitive: false, isArray: true))
+                            properties.insert(Property(name: name, type: "[Int]", underlying: json))
+                        case .double(_): properties.insert(Property(name: name, type: "[Double]", underlying: json))
+                        case .string(_): properties.insert(Property(name: name, type: "[String]", underlying: json))
+                        case .date(_): properties.insert(Property(name: name, type: "[Date]", underlying: json))
+                        case .url(_):  properties.insert(Property(name: name, type: "[URL]", underlying: json))
+                        case .locale(_): properties.insert(Property(name: name, type: "[Locale]", underlying: json))
                         case .array(let a):
                             let subjson = JSON(value: a)!
                             let type = handleJSON!(name, subjson)
-                            let internetPrimitive = subjson.type.lowercased() != "array" && subjson.type.lowercased() != "dictionary"
-                            let property = Property(name: name, type: "[\(type!.generatedClassName())]", internetPrimitive: internetPrimitive, isArray: true)
+                            let property = Property(name: name, type: "[\(type!.generatedClassName())]", underlying: json)
                             properties.insert(property)
                             returnValue = "[\(type!.generatedClassName())]"
                         case .dictionary(let d):
                             structs.append(contentsOf: structify(name: name, json: d))
-                            properties.insert(Property(name: name, type: "[\(name.generatedClassName())]", internetPrimitive: false, isArray: true))
+                            properties.insert(Property(name: name, type: "[\(name.generatedClassName())]", underlying: json))
                             returnValue = name.generatedClassName()
-                        case .null: properties.insert(Property(name: name, type: "[NSNull]", isArray: true))
+                        case .null: properties.insert(Property(name: name, type: "[NSNull]", underlying: json))
                         }
                     }
 
                     if !returnValue.isEmpty { return returnValue }
                 } else {
-                    if types.keys.count == 2 {
+                    if types.keys.isEmpty {
+                        properties.insert(Property(name: name, type: name.generatedClassName(), underlying: json))
+                    } else if types.keys.count == 2 {
                         let hasInt = types.keys.reduce(false) { return $0 || $1.lowercased() == "int" }
                         let hasBool = types.keys.reduce(false) { return $0 || $1.lowercased() == "bool" }
 
                         if hasInt && hasBool {
-                            properties.insert(Property(name: name, type: "[Int]", isArray: true))
+                            properties.insert(Property(name: name, type: "[Int]", underlying: json))
                         } else {
-                            properties.insert(Property(name: name, type: "[Any]", isArray: true))
+                            properties.insert(Property(name: name, type: "[Any]", underlying: json))
                         }
                     } else {
-                        properties.insert(Property(name: name, type: "[Any]", isArray: true))
+                        properties.insert(Property(name: name, type: "[Any]", underlying: json))
                     }
                 }
             }
@@ -98,19 +99,20 @@ extension Sequence where Iterator.Element == Struct {
                 let existsInBoth = $1.properties.intersection(existing.properties)
                 let allProperties = $1.properties.union(existing.properties)
                 let optionalProperties = allProperties.subtracting(existsInBoth).map {
-                    return Property(name: $0.name, type: $0.type, internetPrimitive: $0.internetPrimitive, isArray: $0.isArray, isOptional: true)
+                    return Property(name: $0.name, type: $0.type, isOptional: true, underlying: $0.underlying)
                 }
 
                 let uniqueProperties = existsInBoth.union(optionalProperties).reduce([String: Property]()) {
                     var properties = $0
                     if let existing = $0[$1.name] {
-
-                        if existing.type == "NSNull" && $1.type != "NSNull" {
-                            properties[$1.name] = Property(name: $1.name, type: $1.type, initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
-                        } else if existing.type != "NSNull" && $1.type == "NSNull" {
-                            properties[$1.name] = Property(name: $1.name, type: existing.type, initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                        if (existing.type == "NSNull" || existing.type == "Any") && ($1.type != "NSNull" && $1.type != "Any") {
+                            properties[$1.name] = Property(name: $1.name, type: $1.type, isOptional: true, underlying: $1.underlying)
+                        } else if (existing.type != "NSNull" || existing.type != "Any") && ($1.type == "NSNull" || $1.type == "Any" ) {
+                            properties[$1.name] = Property(name: $1.name, type: existing.type, isOptional: true, underlying: $1.underlying)
                         } else {
-                            properties[$1.name] = Property(name: $1.name, type: "Any", initializerParameter: $1.initializerParameter, internetPrimitive: $1.internetPrimitive, isArray: $1.isArray, isOptional: true)
+                            print("--- \($1.name) ---")
+                            print($1)
+                            properties[$1.name] = Property(name: $1.name, type: "Any", isOptional: true, underlying: $1.underlying)
                         }
                     } else {
                         properties[$1.name] = $1
