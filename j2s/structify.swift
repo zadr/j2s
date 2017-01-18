@@ -110,9 +110,10 @@ extension Sequence where Iterator.Element == Struct {
                         } else if (existing.type != "NSNull" || existing.type != "Any") && ($1.type == "NSNull" || $1.type == "Any" ) {
                             properties[$1.name] = Property(name: $1.name, type: existing.type, isOptional: true, underlying: $1.underlying)
                         } else {
-                            print("--- \($1.name) ---")
-                            print($1)
-                            properties[$1.name] = Property(name: $1.name, type: "Any", isOptional: true, underlying: $1.underlying)
+                            switch (existing.underlying, $1.underlying) {
+                            case (.string(_), .url(_)): properties[$1.name] = Property(name: $1.name, type: existing.type, isOptional: existing.isOptional || existing.isOptional, underlying: existing.underlying)
+                            default: properties[$1.name] = Property(name: $1.name, type: "Any", isOptional: true, underlying: $1.underlying)
+                            }
                         }
                     } else {
                         properties[$1.name] = $1
