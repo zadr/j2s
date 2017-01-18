@@ -19,19 +19,17 @@ public struct Struct: CustomStringConvertible {
         }
 
         d += "public struct \(typeName) {"
-        if !properties.isEmpty {
-            d += "\(propertyDeclarationCode)\n"
-            d += "\n\(initCode)\n"
-            d += "}\n"
-            d += "\nextension \(typeName): Equatable {\n \(equatableCode) \n}\n"
-            d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n}\n"
-        } else {
-            d += "}\n"
-        }
+        d += "\(propertyDeclarationCode)\n"
+        d += "\n\(initCode)\n"
+        d += "}\n"
+        d += "\nextension \(typeName): Equatable {\n \(equatableCode) \n}\n"
+        d += "\nextension \(typeName): Hashable {\n \(hashableCode) \n}\n"
         return d
     }
 
     private var propertyDeclarationCode: String {
+        if properties.isEmpty { return "" }
+
         let separator = "\n\tlet "
         let sorted = properties.sorted(by: { x, y in return x.name < y.name })
         return separator + sorted.map({
