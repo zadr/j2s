@@ -161,6 +161,12 @@ public struct Struct: CustomStringConvertible {
         var equation = "\tpublic static func ==(x: \(name.generatedClassName()), y: \(name.generatedClassName())) -> Bool {\n\t\treturn "
         let sorted = properties.sorted(by: { x, y in return x.name < y.name })
         let equations: [String] = sorted.map {
+            if $0.underlying.isArray && $0.isOptional {
+                var arrayEquation = "(x.\($0.name.camelCased())?.count ?? 0) == (y.\($0.name.camelCased())?.count ?? 0) && "
+                arrayEquation += "\n\t\t\t\t(0 ..< (x.\($0.name.camelCased())?.count ?? 0)).reduce(true, { $0 && x.\($0.name.camelCased())?[$1] == y.\($0.name.camelCased())?[$1] })"
+                return arrayEquation
+            }
+
             return "x.\($0.name.camelCased()) == y.\($0.name.camelCased())"
         }
         equation += equations.joined(separator: " && \n\t\t\t")
