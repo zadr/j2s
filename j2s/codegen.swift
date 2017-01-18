@@ -213,17 +213,11 @@ public struct Property: Equatable, Hashable {
     }
 
     public static func ==(x: Property, y: Property) -> Bool {
-        return x.name == y.name &&
-            x.type == y.type &&
-            x.underlying == y.underlying &&
-            x.isOptional == y.isOptional
+        return x.name == y.name
     }
 
     public var hashValue: Int {
-        return name.hashValue ^
-            type.hashValue ^
-            isOptional.hashValue ^
-            underlying.hashValue
+        return name.hashValue
     }
 }
 
