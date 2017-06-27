@@ -1,4 +1,4 @@
-j## What's this?
+## What's this?
 `j2s` is a macOS app that converts [`JSON`](https://en.wikipedia.org/wiki/JSON) dictionaries into [Swift](https://swift.org) `struct`s.
 
 ![Screenshot](Screenshot.png?raw=true)
