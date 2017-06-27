@@ -1,23 +1,44 @@
 import Foundation
 
-public class Struct: CustomStringConvertible {
+public class Struct {
     var name: String
     let properties: Set<Property>
+
+	var parent: Struct? = nil
+	var children = [Struct]()
 
 	init(name: String, properties: Set<Property>) {
 		self.name = name
 		self.properties = properties
 	}
 
-    public var description: String {
+    public var structDeclaration: String {
         let typeName = name.generatedClassName()
-		return """
+		var code = """
 		public struct \(typeName): Codable {
 			\(propertyDeclarationCode)
+		"""
 
-			\(codingKeysCode)
+		if !children.isEmpty {
+			code += "\n\n"
+			code += children.map({
+				return $0.structDeclaration.linesPrefixedWithTab()
+			}).joined(separator: "\n\t")
 		}
 
+		code += "\n\n"
+		code += """
+			\(codingKeysCode)
+		}
+		"""
+
+		return code
+	}
+
+	public var extensionDeclaration: String {
+		let typeName = name.generatedClassName()
+
+		return """
 		extension \(typeName) {
 		\(singleInitCode)
 
@@ -48,15 +69,14 @@ public class Struct: CustomStringConvertible {
 		if strategies.isEmpty {
 			let typeName = name.generatedClassName()
 			return """
-			\tstatic func decode(from data: Data) -> \(typeName)  {
-				\tlet decoder = JSONDecoder()
-				\treturn decoder.decode(\(typeName).self, from: data)
+			\tstatic func create(with data: Data) -> \(typeName)  {
+				\treturn JSONDecoder().decode(\(typeName).self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			let typeName = name.generatedClassName()
 			return """
-			\tstatic func decode(from data: Data) -> \(typeName)  {
+			\tstatic func create(with data: Data) -> \(typeName)  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
 				\treturn decoder.decode(\(typeName).self, from: data)
@@ -79,15 +99,14 @@ public class Struct: CustomStringConvertible {
 		if strategies.isEmpty {
 			let typeName = name.generatedClassName()
 			return """
-			\tstatic func decode(from data: Data) -> [\(typeName)]  {
-				\tlet decoder = JSONDecoder()
-				\treturn decoder.decode([\(typeName)].self, from: data)
+			\tstatic func create(with data: Data) -> [\(typeName)]  {
+				\treturn JSONDecoder().decode([\(typeName)].self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			let typeName = name.generatedClassName()
 			return """
-			\tstatic func decode(from data: Data) -> [\(typeName)]  {
+			\tstatic func create(with data: Data) -> [\(typeName)]  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
 				\treturn decoder.decode([\(typeName)].self, from: data)

@@ -54,11 +54,37 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
 
             if let dictionary = parsed as? [String: Any] {
                 structs = structify(name: rootElementName(), json: dictionary)
-                output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
             } else if let array = parsed as? [[String: Any]] {
                 structs = array.map({ return structify(name: rootElementName(), json: $0) }).joined().merge()
-                output.string = structs.map({ return $0.description }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
-            }
+			} else {
+				output.string = input.string!
+				return
+			}
+
+			let data = structs.map({ return $0.structDeclaration }).joined(separator: "\n\n// MARK: -\n\n") + "\n\n// MARK: -\n"
+
+			func flatten(_ needle: [Struct], into target: [String: Struct]) -> [String: Struct] {
+				var result = target
+				for s in needle {
+					result[s.name] = s
+
+					for c in s.children {
+						result[c.name] = c
+					}
+				}
+				return result
+			}
+
+			var current = [String: Struct]()
+			var next = flatten(structs, into: current)
+			while Array(current.keys) != Array(next.keys) {
+				current = next
+				next = flatten(Array(current.values), into: current)
+			}
+
+			let extensions = next.values.map({ return $0.extensionDeclaration }).joined(separator: "\n\n// MARK: -\n\n") + "\n"
+
+			output.string = data + "\n" + extensions
         } catch let exception {
             if data.isEmpty {
                 output.string = ""
@@ -99,7 +125,8 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
                     if choice == NSFileHandlingPanelOKButton, let url = savePanel.directoryURL {
                         self.structs.forEach {
                             let url = url.appendingPathComponent($0.name.generatedClassName()).appendingPathExtension("swift")
-                            return try! $0.description.write(to: url, atomically: true, encoding: .utf8)
+							let data = $0.structDeclaration + "\n// MARK: -\n" + $0.extensionDeclaration
+                            return try! data.write(to: url, atomically: true, encoding: .utf8)
                         }
                     }
                 }

@@ -122,4 +122,13 @@ internal extension String {
 
         return camelCased.isEmpty ? "/* \(self) */ invalidKey" : camelCased
     }
+
+	func linesPrefixedWithTab() -> String {
+		var lines = [String]()
+		(self as NSString).enumerateLines { (line, _) in
+			lines.append("\t" + line)
+		}
+		return lines.joined(separator: "\n")
+	}
+
 }

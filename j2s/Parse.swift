@@ -10,12 +10,13 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
             case .int(_): properties.insert(Property(name: name, type: "Int", underlying: json))
             case .double(_): properties.insert(Property(name: name, type: "Double", underlying: json))
             case .string(_): properties.insert(Property(name: name, type: "String", underlying: json))
-            case .null: properties.insert(Property(name: name, type: "NSNull", underlying: json))
+            case .null: properties.insert(Property(name: name, type: "Any?", underlying: json))
             case .date(_, _): properties.insert(Property(name: name, type: "Date", underlying: json))
             case .url(_): properties.insert(Property(name: name, type: "URL", underlying: json))
             case .dictionary(let d):
                 properties.insert(Property(name: name, type: name.generatedClassName(), underlying: json))
-                structs.append(contentsOf: structify(name: name, json: d))
+				let s = structify(name: name, json: d)
+				structs.append(contentsOf: s)
             case .array(let a):
                 var types = [String: Int]()
                 var jsons = [JSON]()
@@ -53,7 +54,7 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
                             structs.append(contentsOf: structify(name: name, json: d))
                             properties.insert(Property(name: name, type: "[\(name.generatedClassName())]", underlying: json))
                             returnValue = name.generatedClassName()
-                        case .null: properties.insert(Property(name: name, type: "[NSNull]", underlying: json))
+                        case .null: properties.insert(Property(name: name, type: "[Any?]", underlying: json))
                         }
                     }
 
@@ -84,7 +85,11 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
         }
     }
 
-    structs.append(Struct(name: name, properties: properties))
+	let s = Struct(name: name, properties: properties)
+	let children = structs.merge()
+	children.forEach { $0.parent = s }
+	s.children = children
+    structs = [ s ]
 
     return structs.merge()
 }
