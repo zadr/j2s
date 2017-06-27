@@ -113,7 +113,7 @@ public struct Foo {
 ```
 
 ## Why build this and not use some other tool?
-Seemed like a good idea. This was before `Codeable` was a thing.
+Seemed like a good idea. This was before `Codable` was a thing.
 
 ## Still hung up on depluralization? (Singularity?)
 A json dictionary with a key named `potatoes`, where the value is a list of dictionaries will be given the Swift type `[Potato]`. Similarly, `soliloquies` becomes `[Soliloquy]`, `dwarves` and `[Dwarf]`, and so on. Depluralization is a giant `if` statement though, so while `indices` becomes `[Index]`, `matrices` incorrectly becomes `matrex`. If Anyone wanted to do some natural language processing to solve this, that would be cool.
