@@ -1,5 +1,5 @@
 ## What's this?
-j2s is a macOS app that converts [JSON](https://en.wikipedia.org/wiki/JSON) dictionaries into [Swift](https://swift.org) `struct`s. It also outputs implementations of [Equatable](https://developer.apple.com/reference/swift/equatable) and [Hashable](https://developer.apple.com/reference/swift/hashable) for every `struct` it generates.
+j2s is a macOS app that converts [JSON](https://en.wikipedia.org/wiki/JSON) dictionaries into [Swift](https://swift.org) `struct`s.
 
 ![Screenshot](Screenshot.png?raw=true)
 
@@ -62,22 +62,6 @@ public struct Demo {
 	}
 }
 
-extension Demo: Equatable {
- 	public static func ==(x: Demo, y: Demo) -> Bool {
-		return x.what == y.what && 
-			x.whatIfIWantTo.count == y.whatIfIWantTo.count && 
-				(0 ..< x.whatIfIWantTo.count).reduce(true, { $0 && x.whatIfIWantTo[$1] == y.whatIfIWantTo[$1] }) && 
-			x.why == y.why
-	} 
-}
-
-extension Demo: Hashable {
- 	public var hashValue: Int {
-		return what.hashValue ^ 
-			whatIfIWantTo.reduce(0, { return 33 &* $0 ^ $1.hashValue }) ^ 
-			why.hashValue
-	} 
-}
 ```
 
 ## What about Optionals? I don't see any Optionals.
@@ -114,27 +98,6 @@ will generate this Swift code:
 ```swift
 public struct Demo {
 	let foo: [Foo]
-
-	init?(_ dictionary: [String: Any]) {
-		if let foo = dictionary["foo"] as? [String: Any] {
-			self.foo = Foo(foo)
-		} else {
-			return nil
-		}
-	}
-}
-
-extension Demo: Equatable {
- 	public static func ==(x: Demo, y: Demo) -> Bool {
-		return x.foo.count == y.foo.count && 
-				(0 ..< x.foo.count).reduce(true, { $0 && x.foo[$1] == y.foo[$1] })
-	} 
-}
-
-extension Demo: Hashable {
- 	public var hashValue: Int {
-		return foo.reduce(0, { return 33 &* $0 ^ $1.hashValue })
-	} 
 }
 
 // MARK: -
@@ -144,50 +107,6 @@ public struct Foo {
 	let baz: Bool?
 	let color: String?
 	let gizmo: String?
-
-	init?(_ dictionary: [String: Any]) {
-		if let bar = dictionary["bar"] as? Int {
-			self.bar = bar
-		} else {
-			return nil
-		}
-		
-		if let baz = dictionary["baz"] as? Bool {
-			self.baz = baz
-		} else {
-			self.baz = nil
-		}
-		
-		if let color = dictionary["color"] as? String {
-			self.color = color
-		} else {
-			self.color = nil
-		}
-		
-		if let gizmo = dictionary["gizmo"] as? String {
-			self.gizmo = gizmo
-		} else {
-			self.gizmo = nil
-		}
-	}
-}
-
-extension Foo: Equatable {
- 	public static func ==(x: Foo, y: Foo) -> Bool {
-		return x.bar == y.bar && 
-			x.baz == y.baz && 
-			x.color == y.color && 
-			x.gizmo == y.gizmo
-	} 
-}
-
-extension Foo: Hashable {
- 	public var hashValue: Int {
-		return bar.hashValue ^ 
-			(baz?.hashValue ?? 0) ^ 
-			(color?.hashValue ?? 0) ^ 
-			(gizmo?.hashValue ?? 0)
-	} 
 }
 ```
 
@@ -196,8 +115,7 @@ There are other awesome codegen tools out there, but, couldn't find anything tha
 
 1. Accepted json, and then…
 2. …Output Swift `struct`s…
-3. …Along with implementations of `Equatable` and `Hashable`…
-4. …Without having to go through an intermediary codegen format.
+3. …Without having to go through an intermediary codegen format.
 
 ## Still hung up on depluralization? (Singularity?)
 A json dictionary with a key named `potatoes`, where the value is a list of dictionaries will be given the Swift type `[Potato]`. Similarly, `soliloquies` becomes `[Soliloquy]`, `dwarves` and `[Dwarf]`, and so on. Depluralization is a giant `if` statement though, so while `indices` becomes `[Index]`, `matrices` incorrectly becomes `matrex`.
