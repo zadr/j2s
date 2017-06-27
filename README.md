@@ -27,59 +27,61 @@ Also, an `Int` like `5` is an `Int` and a floating point number like `5.0` is a 
 
 ```json
 {
-  "what_if_i_want_to" : [
-    "type? sure, but uncheck the \"Pretty-Print JSON\" box down there --v",
-    "boogie? wouldn't dream of stopping you"
-  ],
-  "why" : "to see swift structs over there -->",
-  "what" : "paste json here"
+  "outer" : true,
+  "nested" : {
+    "what_if_i_want_to" : [
+      "type? sure, but uncheck the \"Pretty-Print JSON\" box down there --v",
+      "boogie? wouldn't dream of stopping you"
+    ],
+    "why" : "to see swift structs over there -->",
+    "what" : "paste json here",
+    "cool" : true
+  }
 }
 ```
 
 and turn it into Swift code that looks like this:
 
 ```swift
-public struct Demo: Codable {
+public struct Root: Codable {
 	let nested: Nested
 	let outer: Bool
 
 	public struct Nested: Codable {
-		let imGoingTo: [String]
+		let cool: Bool
 		let what: String
+		let whatIfIWantTo: [String]
+		let why: String
 
 		private enum CodingKeys: String, CodingKey {
-			case im_going_to_ = "imGoingTo"
+			case cool
 			case what
+			case what_if_i_want_to = "whatIfIWantTo"
+			case why
 		}
 	}
 
-	private enum CodingKeys: String, CodingKey {
-		case nested
-		case outer
+// MARK: -
+
+extension Root.Nested {
+	static func create(with data: Data) -> Root.Nested  {
+		return JSONDecoder().decode(Root.Nested.self, from: data)
+	}
+
+	static func create(with data: Data) -> [Root.Nested]  {
+		return JSONDecoder().decode([Root.Nested].self, from: data)
 	}
 }
 
 // MARK: -
 
-extension Nested {
-	static func create(with data: Data) -> Nested  {
-		return JSONDecoder().decode(Nested.self, from: data)
+extension Root {
+	static func create(with data: Data) -> Root  {
+		return JSONDecoder().decode(Root.self, from: data)
 	}
 
-	static func create(with data: Data) -> [Nested]  {
-		return JSONDecoder().decode([Nested].self, from: data)
-	}
-}
-
-// MARK: -
-
-extension Demo {
-	static func create(with data: Data) -> Demo  {
-		return JSONDecoder().decode(Demo.self, from: data)
-	}
-
-	static func create(with data: Data) -> [Demo]  {
-		return JSONDecoder().decode([Demo].self, from: data)
+	static func create(with data: Data) -> [Root]  {
+		return JSONDecoder().decode([Root].self, from: data)
 	}
 }
 ```

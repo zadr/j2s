@@ -7,6 +7,18 @@ public class Struct {
 	var parent: Struct? = nil
 	var children = [Struct]()
 
+	var recursiveTypeName: String {
+		var typeName = name.generatedClassName()
+		var p = parent
+
+		while p != nil {
+			typeName = "\(p!.name.generatedClassName()).\(typeName)"
+			p = parent?.parent
+		}
+
+		return typeName
+	}
+
 	init(name: String, properties: Set<Property>) {
 		self.name = name
 		self.properties = properties
@@ -26,20 +38,21 @@ public class Struct {
 			}).joined(separator: "\n\t")
 		}
 
-		code += "\n\n"
-		code += """
-			\(codingKeysCode)
+		let codingKeys = codingKeysCode
+		if !codingKeys.isEmpty {
+			code += "\n\n"
+			code += """
+				\(codingKeys)
+			}
+			"""
 		}
-		"""
 
 		return code
 	}
 
 	public var extensionDeclaration: String {
-		let typeName = name.generatedClassName()
-
 		return """
-		extension \(typeName) {
+		extension \(recursiveTypeName) {
 		\(singleInitCode)
 
 		\(multipleInitCode)
@@ -67,19 +80,17 @@ public class Struct {
 		}
 
 		if strategies.isEmpty {
-			let typeName = name.generatedClassName()
 			return """
-			\tstatic func create(with data: Data) -> \(typeName)  {
-				\treturn JSONDecoder().decode(\(typeName).self, from: data)
+			\tstatic func create(with data: Data) -> \(recursiveTypeName)  {
+				\treturn JSONDecoder().decode(\(recursiveTypeName).self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
-			let typeName = name.generatedClassName()
 			return """
-			\tstatic func create(with data: Data) -> \(typeName)  {
+			\tstatic func create(with data: Data) -> \(recursiveTypeName)  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
-				\treturn decoder.decode(\(typeName).self, from: data)
+				\treturn decoder.decode(\(recursiveTypeName).self, from: data)
 			\t}
 			"""
 		} else {
@@ -97,19 +108,17 @@ public class Struct {
 		}
 
 		if strategies.isEmpty {
-			let typeName = name.generatedClassName()
 			return """
-			\tstatic func create(with data: Data) -> [\(typeName)]  {
-				\treturn JSONDecoder().decode([\(typeName)].self, from: data)
+			\tstatic func create(with data: Data) -> [\(recursiveTypeName)]  {
+				\treturn JSONDecoder().decode([\(recursiveTypeName)].self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
-			let typeName = name.generatedClassName()
 			return """
-			\tstatic func create(with data: Data) -> [\(typeName)]  {
+			\tstatic func create(with data: Data) -> [\(recursiveTypeName)]  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
-				\treturn decoder.decode([\(typeName)].self, from: data)
+				\treturn decoder.decode([\(recursiveTypeName)].self, from: data)
 			\t}
 			"""
 		} else {
@@ -120,14 +129,22 @@ public class Struct {
 
 	private var codingKeysCode: String {
 		let sorted = properties.sorted(by: { x, y in return x.name < y.name })
-		return "private enum CodingKeys: String, CodingKey {\n\t" +
-			sorted.map({ (p: Property) -> String in
+		var modified = false // map having side effects is :/
+		let codingKeys = sorted.map({ (p: Property) -> String in
 			let camelCased = p.name.camelCased()
 			if camelCased == p.name {
 				return "\tcase \(p.name)"
 			}
+
+			modified = true
 			return "\tcase \(p.name) = \"\(camelCased)\""
-		}).joined(separator: "\n\t") + "\n\t}"
+		}).joined(separator: "\n\t")
+
+		if modified {
+			return "private enum CodingKeys: String, CodingKey {\n\t" + codingKeys + "\n\t}"
+		}
+
+		return ""
 	}
 }
 
