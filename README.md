@@ -1,4 +1,4 @@
-j## What's this?
+## What's this?
 `j2s` is a macOS app that converts [`JSON`](https://en.wikipedia.org/wiki/JSON) dictionaries into [Swift](https://swift.org) `struct`s.
 
 ![Screenshot](Screenshot.png?raw=true)
@@ -12,11 +12,11 @@ If you want to make it do anything else, you'll have to write some more code. I'
 Yup.
 
 ## Cool
-Yeah. `j2s` will convert snake_case_key_names into camelCasePropertyNames, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/StringTransformations.swift#L14) (exact line of code may change, but look around there for the algorithm).
+Yeah. `j2s` will also convert `snake_case_key_names` into `camelCasePropertyNames`, and if you have a key where the value is an array of of dictionaries, the key name will be — naively — [depluralized](https://github.com/zadr/j2s/blob/main/j2s/StringTransformations.swift#L14) (exact line of code may change, but look around there for the algorithm).
 
 And, if your `JSON` value is a string that's secretly a `Date` in a format that `j2s` understands (Currently: `ISO8601`), the generated code will use the correct (`Date`) type.
 
-Also, an `Int` like `5` is an `Int` and a floating point number like `5.0` is a `Double`. Because, you know, thats how these things should work.
+Also, an integer like `5` is an `Int` and a floating point number like `5.0` is a `Double`. Because, you know, thats how these things should work.
 
 ## What version of Swift does this target?
 `j2s.xcodeproj` requires Swift 4 (Xcode 9 or greater) to build. The code it outputs requires Swift 4. If you need Swift 3 support, try looking back in commit history for an older version.
@@ -30,11 +30,9 @@ Also, an `Int` like `5` is an `Int` and a floating point number like `5.0` is a 
   "outer" : true,
   "nested" : {
     "what_if_i_want_to" : [
-      "type? sure, but uncheck the \"Pretty-Print JSON\" box down there --v",
       "boogie? wouldn't dream of stopping you"
     ],
-    "why" : "to see swift structs over there -->",
-    "what" : "paste json here",
+    "when" : "2017-06-27T17:58:28+00:00",
     "cool" : true
   }
 }
@@ -49,15 +47,13 @@ public struct Root: Codable {
 
 	public struct Nested: Codable {
 		let cool: Bool
-		let what: String
 		let whatIfIWantTo: [String]
-		let why: String
+		let when: Date
 
 		private enum CodingKeys: String, CodingKey {
 			case cool
-			case what
 			case what_if_i_want_to = "whatIfIWantTo"
-			case why
+			case when
 		}
 	}
 
@@ -65,11 +61,15 @@ public struct Root: Codable {
 
 extension Root.Nested {
 	static func create(with data: Data) -> Root.Nested  {
-		return JSONDecoder().decode(Root.Nested.self, from: data)
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		return decoder.decode(Root.Nested.self, from: data)
 	}
 
 	static func create(with data: Data) -> [Root.Nested]  {
-		return JSONDecoder().decode([Root.Nested].self, from: data)
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		return decoder.decode([Root.Nested].self, from: data)
 	}
 }
 
