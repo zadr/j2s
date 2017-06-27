@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B6092DD91E1CC733000A9A6A /* BCP47Identification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6092DD81E1CC733000A9A6A /* BCP47Identification.swift */; };
 		B61168111E19DA7C0066EEFE /* StringTransformations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61168101E19DA7C0066EEFE /* StringTransformations.swift */; };
 		B6D3E02D1E17709F00841A0D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D3E02C1E17709F00841A0D /* AppDelegate.swift */; };
 		B6D3E02F1E17709F00841A0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6D3E02E1E17709F00841A0D /* Assets.xcassets */; };
@@ -17,7 +16,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B6092DD81E1CC733000A9A6A /* BCP47Identification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BCP47Identification.swift; sourceTree = "<group>"; };
 		B61168101E19DA7C0066EEFE /* StringTransformations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringTransformations.swift; sourceTree = "<group>"; };
 		B61168121E19DB7A0066EEFE /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
 		B61168131E19DB7A0066EEFE /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
@@ -76,7 +74,6 @@
 				B6FA39A41E183D2E00924992 /* codegen.swift */,
 				B6FA39A61E183D8200924992 /* structify.swift */,
 				B61168101E19DA7C0066EEFE /* StringTransformations.swift */,
-				B6092DD81E1CC733000A9A6A /* BCP47Identification.swift */,
 				B6D3E02E1E17709F00841A0D /* Assets.xcassets */,
 				B6D3E0301E17709F00841A0D /* MainMenu.xib */,
 				B6D3E0331E17709F00841A0D /* Info.plist */,
@@ -156,7 +153,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B6092DD91E1CC733000A9A6A /* BCP47Identification.swift in Sources */,
 				B6FA39A71E183D8200924992 /* structify.swift in Sources */,
 				B61168111E19DA7C0066EEFE /* StringTransformations.swift in Sources */,
 				B6D3E02D1E17709F00841A0D /* AppDelegate.swift in Sources */,

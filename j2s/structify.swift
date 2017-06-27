@@ -13,7 +13,6 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
             case .null: properties.insert(Property(name: name, type: "NSNull", underlying: json))
             case .date(_, _): properties.insert(Property(name: name, type: "Date", underlying: json))
             case .url(_): properties.insert(Property(name: name, type: "URL", underlying: json))
-            case .locale(_): properties.insert(Property(name: name, type: "Locale", underlying: json))
             case .dictionary(let d):
                 properties.insert(Property(name: name, type: name.generatedClassName(), underlying: json))
                 structs.append(contentsOf: structify(name: name, json: d))
@@ -44,7 +43,6 @@ func structify(name: String = "root", json: [String: Any]) -> [Struct] {
                         case .string(_): properties.insert(Property(name: name, type: "[String]", underlying: json))
                         case .date(_): properties.insert(Property(name: name, type: "[Date]", underlying: json))
                         case .url(_):  properties.insert(Property(name: name, type: "[URL]", underlying: json))
-                        case .locale(_): properties.insert(Property(name: name, type: "[Locale]", underlying: json))
                         case .array(let a):
                             let subjson = JSON(value: a)!
                             let type = handleJSON!(name, subjson)
