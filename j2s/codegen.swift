@@ -1,40 +1,115 @@
 import Foundation
 
-public struct Struct: CustomStringConvertible {
+public class Struct: CustomStringConvertible {
     var name: String
     let properties: Set<Property>
 
+	init(name: String, properties: Set<Property>) {
+		self.name = name
+		self.properties = properties
+	}
+
     public var description: String {
         let typeName = name.generatedClassName()
-        var d = ""
-        properties.flatMap { (json) -> String? in
-            if case .date(_, let format) = json.underlying { return format }
-            return nil
-        } .forEach {
-            d += "\nprivate let \(typeName)DateFormatter\(abs($0.hashValue)): DateFormatter = {"
-            d += "\n\tvar dateFormatter = DateFormatter()"
-            d += "\n\tdateFormatter.dateFormat = \"\($0)\""
-            d += "\n\treturn dateFormatter"
-            d += "\n}()\n\n"
-        }
+		return """
+		public struct \(typeName): Codable {
+			\(propertyDeclarationCode)
 
-		d += "public struct \(typeName): Codable {"
-        d += "\(propertyDeclarationCode)\n"
-        d += "}\n"
-        return d
+			\(codingKeysCode)
+		}
+
+		extension \(typeName) {
+		\(singleInitCode)
+
+		\(multipleInitCode)
+		}
+		"""
     }
 
     private var propertyDeclarationCode: String {
         if properties.isEmpty { return "" }
 
-        let separator = "\n\tlet "
-        let sorted = properties.sorted(by: { x, y in return x.name < y.name })
-        return separator + sorted.map({
+		let sorted = properties.sorted(by: { x, y in return x.name < y.name })
+        return "let " + sorted.map({
             let l = "\($0.name.camelCased()): \($0.type.generatedClassName())"
             if $0.isOptional { return "\(l)?" }
             return l
-        }).joined(separator: separator)
+        }).joined(separator: "\n\tlet ")
     }
+
+	private var singleInitCode: String {
+		var strategies = Set<JSONDecoder.DateDecodingStrategy>()
+		for property in properties {
+			if case .date(_, let strategy) = property.underlying {
+				strategies.insert(strategy)
+			}
+		}
+
+		if strategies.isEmpty {
+			let typeName = name.generatedClassName()
+			return """
+			\tstatic func decode(from data: Data) -> \(typeName)  {
+				\tlet decoder = JSONDecoder()
+				\treturn decoder.decode(\(typeName).self, from: data)
+			\t}
+			"""
+		} else if strategies.contains(.iso8601) {
+			let typeName = name.generatedClassName()
+			return """
+			\tstatic func decode(from data: Data) -> \(typeName)  {
+				\tlet decoder = JSONDecoder()
+				\tdecoder.dateDecodingStrategy = .iso8601
+				\treturn decoder.decode(\(typeName).self, from: data)
+			\t}
+			"""
+		} else {
+			assert(strategies.isEmpty || strategies.count == 1)
+			fatalError()
+		}
+	}
+
+	private var multipleInitCode: String {
+		var strategies = Set<JSONDecoder.DateDecodingStrategy>()
+		for property in properties {
+			if case .date(_, let strategy) = property.underlying {
+				strategies.insert(strategy)
+			}
+		}
+
+		if strategies.isEmpty {
+			let typeName = name.generatedClassName()
+			return """
+			\tstatic func decode(from data: Data) -> [\(typeName)]  {
+				\tlet decoder = JSONDecoder()
+				\treturn decoder.decode([\(typeName)].self, from: data)
+			\t}
+			"""
+		} else if strategies.contains(.iso8601) {
+			let typeName = name.generatedClassName()
+			return """
+			\tstatic func decode(from data: Data) -> [\(typeName)]  {
+				\tlet decoder = JSONDecoder()
+				\tdecoder.dateDecodingStrategy = .iso8601
+				\treturn decoder.decode([\(typeName)].self, from: data)
+			\t}
+			"""
+		} else {
+			assert(strategies.isEmpty || strategies.count == 1)
+			fatalError()
+		}
+	}
+
+	private var codingKeysCode: String {
+		let sorted = properties.sorted(by: { x, y in return x.name < y.name })
+		return "private enum CodingKeys: String, CodingKey {\n\t" +
+			sorted.map({ (p: Property) -> String in
+			let camelCased = p.name.camelCased()
+			if camelCased == p.name {
+				return "\tcase \(p.name)"
+			}
+			return "\tcase \(p.name) = \"\(camelCased)\""
+		}).joined(separator: "\n\t") + "\n\t}"
+	}
 }
 
 public struct Property: Equatable, Hashable {
@@ -60,14 +135,6 @@ public struct Property: Equatable, Hashable {
     }
 }
 
-private let dateFormatters: [DateFormatter] = [
-    {
-        var f: DateFormatter = DateFormatter()
-        f.dateFormat = "eee MMM dd HH:mm:ss Z yyyy"
-        return f
-    }()
-]
-
 public enum JSON {
     init?(value: Any) {
         if let number = value as? NSNumber {
@@ -89,21 +156,14 @@ public enum JSON {
             case .float32Type: fallthrough
             case .float64Type: fallthrough
             case .doubleType: fallthrough
-            case .cgFloatType: self = .double(value as! Double)
-            }
-        } else if let string = value as? String {
-            for dateFormatter in dateFormatters {
-                if let date = dateFormatter.date(from: string) {
-                    self = .date(date, dateFormatter.dateFormat)
-                    return
-                }
-            }
-
-            /* if let url = URL(string: string), !(url.scheme ?? "").isEmpty {
-                self = .url(url)
-            }  else { */
-                self = .string(string)
-//            }
+			case .cgFloatType: self = .double(value as! Double)
+        }
+	} else if let string = value as? String {
+			if let date = ISO8601DateFormatter().date(from: string) {
+				self = .date(date, .iso8601)
+			} else {
+				self = .string(string)
+			}
         } else if let array = value as? [Any] {
             self = .array(array)
         } else if let dictionary = value as? [String: Any] {
@@ -119,7 +179,7 @@ public enum JSON {
     case int(Int)
     case double(Double)
     case string(String)
-    case date(Date, String)
+    case date(Date, JSONDecoder.DateDecodingStrategy)
     case url(URL)
     case array([Any])
     case dictionary([String: Any])
@@ -198,4 +258,31 @@ extension JSON: Hashable, Equatable {
         default: return false
         }
     }
+}
+
+extension JSONDecoder.DateDecodingStrategy: Equatable {
+	public static func ==(x: JSONDecoder.DateDecodingStrategy, y: JSONDecoder.DateDecodingStrategy) -> Bool {
+		switch (x, y) {
+		case (.custom(_), .custom(_)): return false
+		case (.formatted(let fx), .formatted(let fy)): return fx == fy
+		case (.deferredToDate, .deferredToDate): return true
+		case (.iso8601, .iso8601): return true
+		case (.millisecondsSince1970, .millisecondsSince1970): return true
+		case (.secondsSince1970, .secondsSince1970): return true
+		default: return false
+		}
+	}
+}
+
+extension JSONDecoder.DateDecodingStrategy: Hashable {
+	public var hashValue: Int {
+		switch self {
+		case .custom(_): fatalError() // unused
+		case .formatted(let f): return f.hashValue
+		case .deferredToDate: return 1
+		case .iso8601: return 8601
+		case .millisecondsSince1970: return 10
+		case .secondsSince1970: return 100
+		}
+	}
 }
