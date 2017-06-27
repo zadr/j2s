@@ -40,16 +40,34 @@ and turn it into Swift code that looks like this:
 
 ```swift
 public struct Demo: Codable {
-	let cool: Bool
-	let what: String
-	let whatIfIWantTo: [String]
-	let why: String
+	let nested: Nested
+	let outer: Bool
+
+	public struct Nested: Codable {
+		let imGoingTo: [String]
+		let what: String
+
+		private enum CodingKeys: String, CodingKey {
+			case im_going_to_ = "imGoingTo"
+			case what
+		}
+	}
 
 	private enum CodingKeys: String, CodingKey {
-		case cool
-		case what
-		case what_if_i_want_to = "whatIfIWantTo"
-		case why
+		case nested
+		case outer
+	}
+}
+
+// MARK: -
+
+extension Nested {
+	static func create(with data: Data) -> Nested  {
+		return JSONDecoder().decode(Nested.self, from: data)
+	}
+
+	static func create(with data: Data) -> [Nested]  {
+		return JSONDecoder().decode([Nested].self, from: data)
 	}
 }
 
@@ -58,7 +76,7 @@ public struct Demo: Codable {
 extension Demo {
 	static func create(with data: Data) -> Demo  {
 		return JSONDecoder().decode(Demo.self, from: data)
-		}
+	}
 
 	static func create(with data: Data) -> [Demo]  {
 		return JSONDecoder().decode([Demo].self, from: data)
