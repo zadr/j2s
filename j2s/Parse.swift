@@ -108,9 +108,9 @@ extension Sequence where Iterator.Element == Struct {
                 let uniqueProperties = existsInBoth.union(optionalProperties).reduce([String: Property]()) {
                     var properties = $0
                     if let existing = $0[$1.name] {
-                        if (existing.type == "NSNull" || existing.type == "Any") && ($1.type != "NSNull" && $1.type != "Any") {
+                        if (existing.type == "Any?" || existing.type == "Any") && ($1.type != "Any?" && $1.type != "Any") {
                             properties[$1.name] = Property(name: $1.name, type: $1.type, isOptional: true, underlying: $1.underlying)
-                        } else if (existing.type != "NSNull" || existing.type != "Any") && ($1.type == "NSNull" || $1.type == "Any" ) {
+                        } else if (existing.type != "Any?" || existing.type != "Any") && ($1.type == "Any?" || $1.type == "Any" ) {
                             properties[$1.name] = Property(name: $1.name, type: existing.type, isOptional: true, underlying: $1.underlying)
                         } else {
                             switch (existing.underlying, $1.underlying) {
