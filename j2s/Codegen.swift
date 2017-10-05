@@ -9,7 +9,7 @@ public class Struct {
 
 	var recursiveTypeName: String {
 		var typeName = name.generatedClassName()
-		var p: Struct? = self
+		var p: Struct? = parent
 
 		while p != nil {
 			typeName = "\(p!.name.generatedClassName()).\(typeName)"
