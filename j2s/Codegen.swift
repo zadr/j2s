@@ -9,11 +9,11 @@ public class Struct {
 
 	var recursiveTypeName: String {
 		var typeName = name.generatedClassName()
-		var p = parent
+		var p: Struct? = self
 
 		while p != nil {
 			typeName = "\(p!.name.generatedClassName()).\(typeName)"
-			p = parent?.parent
+			p = p?.parent
 		}
 
 		return typeName
