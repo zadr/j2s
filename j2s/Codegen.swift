@@ -137,7 +137,7 @@ public class Struct {
 			}
 
 			modified = true
-			return "\tcase \(p.name) = \"\(camelCased)\""
+			return "\tcase \(camelCased) = \"\(p.name)\""
 		}).joined(separator: "\n\t")
 
 		if modified {
