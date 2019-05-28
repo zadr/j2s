@@ -46,7 +46,7 @@ public class Struct {
 			"""
 		}
 
-		code += "\n}\n"
+		code += "\n}"
 
 		return code
 	}
@@ -82,16 +82,16 @@ public class Struct {
 
 		if strategies.isEmpty {
 			return """
-			\tstatic func create(with data: Data) -> \(recursiveTypeName)  {
-				\treturn JSONDecoder().decode(\(recursiveTypeName).self, from: data)
+			\tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
+				\treturn try JSONDecoder().decode(\(recursiveTypeName).self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			return """
-			\tstatic func create(with data: Data) -> \(recursiveTypeName)  {
+			\tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
-				\treturn decoder.decode(\(recursiveTypeName).self, from: data)
+				\treturn try decoder.decode(\(recursiveTypeName).self, from: data)
 			\t}
 			"""
 		} else {
@@ -110,16 +110,16 @@ public class Struct {
 
 		if strategies.isEmpty {
 			return """
-			\tstatic func create(with data: Data) -> [\(recursiveTypeName)]  {
-				\treturn JSONDecoder().decode([\(recursiveTypeName)].self, from: data)
+			\tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
+				\treturn try JSONDecoder().decode([\(recursiveTypeName)].self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			return """
-			\tstatic func create(with data: Data) -> [\(recursiveTypeName)]  {
+			\tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
-				\treturn decoder.decode([\(recursiveTypeName)].self, from: data)
+				\treturn try decoder.decode([\(recursiveTypeName)].self, from: data)
 			\t}
 			"""
 		} else {
