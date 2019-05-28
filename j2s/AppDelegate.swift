@@ -18,6 +18,15 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
         input.isAutomaticQuoteSubstitutionEnabled = false
         output.isAutomaticQuoteSubstitutionEnabled = false
 
+		if let pasteboardString = NSPasteboard.general.string(forType: .string),
+			let data = pasteboardString.data(using: .utf8) {
+
+			do {
+				_ = try JSONSerialization.jsonObject(with: data, options: [])
+				input.string = pasteboardString
+			} catch {}
+		}
+
         textDidChange()
 
         prettyPrint.target = self
