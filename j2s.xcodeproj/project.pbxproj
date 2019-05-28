@@ -20,7 +20,7 @@
 		B61168121E19DB7A0066EEFE /* CODE_OF_CONDUCT.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CODE_OF_CONDUCT.md; sourceTree = "<group>"; };
 		B61168131E19DB7A0066EEFE /* LICENSE.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		B61168141E19DB7A0066EEFE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		B6D3E0291E17709F00841A0D /* j2s.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = j2s.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6D3E0291E17709F00841A0D /* json2swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = json2swift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D3E02C1E17709F00841A0D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B6D3E02E1E17709F00841A0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B6D3E0311E17709F00841A0D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -62,7 +62,7 @@
 		B6D3E02A1E17709F00841A0D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B6D3E0291E17709F00841A0D /* j2s.app */,
+				B6D3E0291E17709F00841A0D /* json2swift.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -99,7 +99,7 @@
 			);
 			name = j2s;
 			productName = j2s;
-			productReference = B6D3E0291E17709F00841A0D /* j2s.app */;
+			productReference = B6D3E0291E17709F00841A0D /* json2swift.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -274,7 +274,7 @@
 				INFOPLIST_FILE = j2s/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nombytes.j2s;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = json2swift;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -288,7 +288,7 @@
 				INFOPLIST_FILE = j2s/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nombytes.j2s;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = json2swift;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
