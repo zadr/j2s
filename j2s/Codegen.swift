@@ -65,7 +65,7 @@ public class Struct {
         if properties.isEmpty { return "" }
 
 		let sorted = properties.sorted(by: { x, y in return x.name < y.name })
-        return "let " + sorted.map({
+        return "public let " + sorted.map({
             let l = "\($0.name.camelCased()): \($0.type.generatedClassName())"
             if $0.isOptional { return "\(l)?" }
             return l
@@ -82,13 +82,13 @@ public class Struct {
 
 		if strategies.isEmpty {
 			return """
-			\tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
+			\tpublic static func create(with data: Data) throws -> \(recursiveTypeName)  {
 				\treturn try JSONDecoder().decode(\(recursiveTypeName).self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			return """
-			\tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
+			\tpublic static func create(with data: Data) throws -> \(recursiveTypeName)  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
 				\treturn try decoder.decode(\(recursiveTypeName).self, from: data)
@@ -110,13 +110,13 @@ public class Struct {
 
 		if strategies.isEmpty {
 			return """
-			\tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
+			\tpublic static func create(with data: Data) throws -> [\(recursiveTypeName)]  {
 				\treturn try JSONDecoder().decode([\(recursiveTypeName)].self, from: data)
 			\t}
 			"""
 		} else if strategies.contains(.iso8601) {
 			return """
-			\tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
+			\tpublic static func create(with data: Data) throws -> [\(recursiveTypeName)]  {
 				\tlet decoder = JSONDecoder()
 				\tdecoder.dateDecodingStrategy = .iso8601
 				\treturn try decoder.decode([\(recursiveTypeName)].self, from: data)

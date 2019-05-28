@@ -42,13 +42,13 @@ and turn it into Swift code that looks like this:
 
 ```swift
 public struct Root: Codable {
-	let nested: Nested
-	let outer: Bool
+	public let nested: Nested
+	public let outer: Bool
 
 	public struct Nested: Codable {
-		let cool: Bool
-		let whatIfIWantTo: [String]
-		let when: Date
+		public let cool: Bool
+		public let whatIfIWantTo: [String]
+		public let when: Date
 
 		private enum CodingKeys: String, CodingKey {
 			case cool
@@ -60,13 +60,13 @@ public struct Root: Codable {
 // MARK: -
 
 extension Root.Nested {
-	static func create(with data: Data) -> Root.Nested  {
+	public static func create(with data: Data) -> Root.Nested  {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .iso8601
 		return decoder.decode(Root.Nested.self, from: data)
 	}
 
-	static func create(with data: Data) -> [Root.Nested]  {
+	public static func create(with data: Data) -> [Root.Nested]  {
 		let decoder = JSONDecoder()
 		decoder.dateDecodingStrategy = .iso8601
 		return decoder.decode([Root.Nested].self, from: data)
@@ -76,11 +76,11 @@ extension Root.Nested {
 // MARK: -
 
 extension Root {
-	static func create(with data: Data) -> Root  {
+	public static func create(with data: Data) -> Root  {
 		return JSONDecoder().decode(Root.self, from: data)
 	}
 
-	static func create(with data: Data) -> [Root]  {
+	public static func create(with data: Data) -> [Root]  {
 		return JSONDecoder().decode([Root].self, from: data)
 	}
 }
@@ -115,12 +115,12 @@ will generate this Swift code:
 
 ```swift
 public struct Demo: Codable {
-	let nested: Nested
-	let outer: Bool
+	public let nested: Nested
+	public let outer: Bool
 
 	public struct Nested: Codable {
-		let imGoingTo: [String]
-		let what: String
+		public let imGoingTo: [String]
+		public let what: String
 
 		private enum CodingKeys: String, CodingKey {
 			case im_going_to_ = "imGoingTo"
@@ -136,25 +136,25 @@ public struct Demo: Codable {
 
 // MARK: -
 
-extension Nested {
-	static func create(with data: Data) -> Nested  {
-		return JSONDecoder().decode(Nested.self, from: data)
+public extension Nested {
+	public static func create(with data: Data) throws -> Nested  {
+		return try JSONDecoder().decode(Nested.self, from: data)
 	}
 
-	static func create(with data: Data) -> [Nested]  {
-		return JSONDecoder().decode([Nested].self, from: data)
+	public static func create(with data: Data) throws -> [Nested]  {
+		return try JSONDecoder().decode([Nested].self, from: data)
 	}
 }
 
 // MARK: -
 
-extension Demo {
-	static func create(with data: Data) -> Demo  {
-		return JSONDecoder().decode(Demo.self, from: data)
+public extension Demo {
+	public static func create(with data: Data) throws -> Demo  {
+		return try JSONDecoder().decode(Demo.self, from: data)
 	}
 
-	static func create(with data: Data) -> [Demo]  {
-		return JSONDecoder().decode([Demo].self, from: data)
+	public static func create(with data: Data) throws -> [Demo]  {
+		return try JSONDecoder().decode([Demo].self, from: data)
 	}
 }
 ```
