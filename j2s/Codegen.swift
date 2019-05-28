@@ -43,9 +43,10 @@ public class Struct {
 			code += "\n\n"
 			code += """
 				\(codingKeys)
-			}
 			"""
 		}
+
+		code += "\n}\n"
 
 		return code
 	}

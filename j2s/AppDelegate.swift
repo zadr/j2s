@@ -33,20 +33,20 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
         return true
     }
 
-    override func controlTextDidChange(_ obj: Notification) {
-        textDidChange()
-    }
+	func controlTextDidChange(_ obj: Notification) {
+		textDidChange()
+	}
 
     func textDidChange(_ notification: Notification) {
         textDidChange()
     }
 
     func textDidChange() {
-        let data = input.string!.data(using: .utf8)!
+        let data = input.string.data(using: .utf8)!
         do {
             let parsed = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
 
-            if prettyPrint.state == NSOnState {
+            if prettyPrint.state == .on {
                 let pretty = try JSONSerialization.data(withJSONObject: parsed, options: .prettyPrinted)
                 let string = String(data: pretty, encoding: .utf8)
                 input.string = string ?? ""
@@ -57,7 +57,7 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
             } else if let array = parsed as? [[String: Any]] {
                 structs = array.map({ return structify(name: rootElementName(), json: $0) }).joined().merge()
 			} else {
-				output.string = input.string!
+				output.string = input.string
 				return
 			}
 
@@ -106,7 +106,7 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
         openPanel.allowedFileTypes = [ "json", "js" ]
         openPanel.allowsMultipleSelection = false
         openPanel.beginSheetModal(for: window) { choice in
-            if choice == NSFileHandlingPanelOKButton, let url = openPanel.url {
+            if choice == .OK, let url = openPanel.url {
                 self.open(url)
             }
         }
@@ -114,7 +114,7 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
 
     @IBAction public func saveDocument(_ sender: Any) {
         if !structs.isEmpty {
-            if filePerStruct.state == NSOnState {
+            if filePerStruct.state == .on {
                 let savePanel = NSOpenPanel()
                 savePanel.canCreateDirectories = true
                 savePanel.canChooseDirectories = true
@@ -122,7 +122,7 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
                 savePanel.prompt = "Save"
 
                 savePanel.beginSheetModal(for: window) { choice in
-                    if choice == NSFileHandlingPanelOKButton, let url = savePanel.directoryURL {
+                    if choice == .OK, let url = savePanel.directoryURL {
                         self.structs.forEach {
                             let url = url.appendingPathComponent($0.name.generatedClassName()).appendingPathExtension("swift")
 							let data = $0.structDeclaration + "\n// MARK: -\n" + $0.extensionDeclaration
@@ -137,8 +137,8 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
                 savePanel.nameFieldStringValue = "Models.swift"
 
                 savePanel.beginSheetModal(for: window) { choice in
-                    if choice == NSFileHandlingPanelOKButton, let url = savePanel.url {
-                        try! self.output.string!.write(to: url, atomically: true, encoding: .utf8)
+                    if choice == .OK, let url = savePanel.url {
+                        try! self.output.string.write(to: url, atomically: true, encoding: .utf8)
                     }
                 }
             }
@@ -153,7 +153,7 @@ extension AppDelegate {
 
     fileprivate func open(_ url: URL) {
         do {
-            if self.prettyPrint.state == NSOnState {
+            if self.prettyPrint.state == .on {
                 let stream = InputStream(url: url)!
                 stream.open()
 
@@ -167,7 +167,7 @@ extension AppDelegate {
 
             self.textDidChange()
 
-            NSDocumentController.shared().noteNewRecentDocumentURL(url)
+			NSDocumentController.shared.noteNewRecentDocumentURL(url)
         } catch let exception {
             print(exception)
         }
