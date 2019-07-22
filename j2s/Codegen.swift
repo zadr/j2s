@@ -53,7 +53,7 @@ public class Struct {
 
 	public var extensionDeclaration: String {
 		return """
-		extension \(recursiveTypeName) {
+		public extension \(recursiveTypeName) {
 		\(singleInitCode)
 
 		\(multipleInitCode)
@@ -69,7 +69,7 @@ public class Struct {
             let l = "\($0.name.camelCased()): \($0.type.generatedClassName())"
             if $0.isOptional { return "\(l)?" }
             return l
-        }).joined(separator: "\n\tlet ")
+        }).joined(separator: "\n\tpublic let ")
     }
 
 	private var singleInitCode: String {
