@@ -1,7 +1,7 @@
 Simplified BSD License
 ======================
 
-_Copyright © `2016`, `Zachary Drayer`_  
+_Copyright © `2016-2019`, `Zachary Drayer`_  
 _All rights reserved._
 
 Redistribution and use in source and binary forms, with or without
