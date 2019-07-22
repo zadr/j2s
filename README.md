@@ -49,39 +49,40 @@ public struct Root: Codable {
 		public let cool: Bool
 		public let whatIfIWantTo: [String]
 		public let when: Date
-
+	
 		private enum CodingKeys: String, CodingKey {
 			case cool
-			case what_if_i_want_to = "whatIfIWantTo"
+			case whatIfIWantTo = "what_if_i_want_to"
 			case when
 		}
-	}
-
-// MARK: -
-
-extension Root.Nested {
-	public static func create(with data: Data) -> Root.Nested  {
-		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = .iso8601
-		return decoder.decode(Root.Nested.self, from: data)
-	}
-
-	public static func create(with data: Data) -> [Root.Nested]  {
-		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = .iso8601
-		return decoder.decode([Root.Nested].self, from: data)
 	}
 }
 
 // MARK: -
 
-extension Root {
-	public static func create(with data: Data) -> Root  {
-		return JSONDecoder().decode(Root.self, from: data)
+public extension Root {
+	static func create(with data: Data) throws -> Root  {
+		return try JSONDecoder().decode(Root.self, from: data)
 	}
 
-	public static func create(with data: Data) -> [Root]  {
-		return JSONDecoder().decode([Root].self, from: data)
+	static func create(with data: Data) throws -> [Root]  {
+		return try JSONDecoder().decode([Root].self, from: data)
+	}
+}
+
+// MARK: -
+
+public extension Root.Nested {
+	static func create(with data: Data) throws -> Root.Nested  {
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		return try decoder.decode(Root.Nested.self, from: data)
+	}
+
+	static func create(with data: Data) throws -> [Root.Nested]  {
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .iso8601
+		return try decoder.decode([Root.Nested].self, from: data)
 	}
 }
 ```
