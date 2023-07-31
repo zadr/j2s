@@ -49,13 +49,7 @@ public struct Root: Codable {
 		public let cool: Bool
 		public let whatIfIWantTo: [String]
 		public let when: Date
-	
-		private enum CodingKeys: String, CodingKey {
-			case cool
-			case whatIfIWantTo = "what_if_i_want_to"
-			case when
 		}
-	}
 }
 
 // MARK: -
@@ -122,16 +116,6 @@ public struct Demo: Codable {
 	public struct Nested: Codable {
 		public let imGoingTo: [String]
 		public let what: String
-
-		private enum CodingKeys: String, CodingKey {
-			case im_going_to_ = "imGoingTo"
-			case what
-		}
-	}
-
-	private enum CodingKeys: String, CodingKey {
-		case nested
-		case outer
 	}
 }
 

@@ -38,15 +38,6 @@ public struct \(typeName): Codable {
 			}).joined(separator: "\n\t")
 		}
 
-		let codingKeys = codingKeysCode
-		if !codingKeys.isEmpty {
-			code += "\n\n"
-			code +=
-"""
-	\(codingKeys)
-"""
-		}
-
 		code += "\n}"
 
 		return code
@@ -137,20 +128,6 @@ public extension \(recursiveTypeName) {
 			assert(strategies.isEmpty || strategies.count == 1)
 			fatalError()
 		}
-	}
-
-	private var codingKeysCode: String {
-		let sorted = properties.sorted(by: { x, y in return x.name < y.name })
-		let codingKeys = sorted.map({ (p: Property) -> String in
-			let camelCased = p.name.camelCased()
-			if camelCased == p.name {
-				return "\tcase \(p.name)"
-			}
-
-			return "\tcase \(camelCased)"
-		}).joined(separator: "\n\t")
-
-		return "private enum CodingKeys: String, CodingKey {\n\t" + codingKeys + "\n\t}"
 	}
 }
 
