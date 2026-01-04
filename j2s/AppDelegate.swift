@@ -75,10 +75,10 @@ extension AppDelegate: NSTextFieldDelegate, NSTextViewDelegate {
 			func flatten(_ needle: [Struct], into target: [String: Struct]) -> [String: Struct] {
 				var result = target
 				for s in needle {
-					result[s.name] = s
+					result[s.recursiveTypeName] = s
 
 					for c in s.children {
-						result[c.name] = c
+						result[c.recursiveTypeName] = c
 					}
 				}
 				return result

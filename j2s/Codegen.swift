@@ -35,7 +35,7 @@ public struct \(typeName): Codable {
 			code += "\n\n"
 			code += children.map({
 				return $0.structDeclaration.linesPrefixedWithTab()
-			}).joined(separator: "\n\t")
+			}).joined(separator: "\n\n")
 		}
 
 		code += "\n}"
@@ -73,8 +73,7 @@ public extension \(recursiveTypeName) {
 		}
 
 		if strategies.isEmpty {
-			return
-"""
+			return """
 \tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
 \t\tlet decoder = JSONDecoder()
 \t\tdecoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -82,8 +81,7 @@ public extension \(recursiveTypeName) {
 \t}
 """
 		} else if strategies.contains(.iso8601) {
-			return
-"""
+			return """
 \tstatic func create(with data: Data) throws -> \(recursiveTypeName)  {
 \t\tlet decoder = JSONDecoder()
 \t\tdecoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -106,8 +104,7 @@ public extension \(recursiveTypeName) {
 		}
 
 		if strategies.isEmpty {
-			return
-"""
+			return """
 \tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
 \t\tlet decoder = JSONDecoder()
 \t\tdecoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -115,13 +112,12 @@ public extension \(recursiveTypeName) {
 \t}
 """
 		} else if strategies.contains(.iso8601) {
-			return
-"""
+			return """
 \tstatic func create(with data: Data) throws -> [\(recursiveTypeName)]  {
 \t\tlet decoder = JSONDecoder()
 \t\tdecoder.keyDecodingStrategy = .convertFromSnakeCase
 \t\tdecoder.dateDecodingStrategy = .iso8601
-\treturn try decoder.decode([\(recursiveTypeName)].self, from: data)
+\t\treturn try decoder.decode([\(recursiveTypeName)].self, from: data)
 \t}
 """
 		} else {
